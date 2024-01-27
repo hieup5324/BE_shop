@@ -24,9 +24,9 @@ export class AuthGuard implements CanActivate {
         throw new BadRequestException('user not token')
       }
       request.currentUser = user;
-      return true;
     } catch (error) {
       throw new ForbiddenException('token het han');
     }
+    return true;
   }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, Request } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { RegisterUserDto } from "./userDTO/registerUser.dto";
 import { UserService } from "./user.service";
@@ -18,8 +18,9 @@ export class AuthService {
         const saveUser = await this.userService.create(requestBody);
         const payload = {
             id: saveUser.id,
-            firtname: saveUser.firstname,
-            lastname: saveUser.lastname,
+            email: saveUser.email,
+            firtname: saveUser.firstName,
+            lastname: saveUser.lastName,
             role: saveUser.role,
         };
 
@@ -37,15 +38,15 @@ export class AuthService {
         if(!userByEmail){
             throw new BadRequestException('tai khoan khong ton tai');
         }
-        const checkpw = await bcrypt.compare(requestBody.password, userByEmail.password);
+        const checkpw = await bcrypt.compare(requestBody.password, userByEmail.passWord);
         if(!checkpw){
             throw new BadRequestException('sai mat khau')
         }
         const payload = {
             id: userByEmail.id,
             email: userByEmail.email,
-            firtname: userByEmail.firstname,
-            lastname: userByEmail.lastname,
+            firtname: userByEmail.firstName,
+            lastname: userByEmail.lastName,
             role: userByEmail.role,
         };
 

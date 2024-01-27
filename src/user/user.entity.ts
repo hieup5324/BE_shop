@@ -1,7 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { ProductEntity } from 'src/product/product.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
-enum ROLE {
+export enum ROLE {
   ADMIN = 'ADMIN',
   USER = 'USER'
 }
@@ -15,16 +16,18 @@ export class UserEntity {
 
   @Column()
   @Exclude()
-  password: string;
+  passWord: string;
 
   @Column()
-  firstname: string;
+  firstName: string;
 
   @Column()
-  lastname: string;
+  lastName: string;
 
   @Column({ default: ROLE.USER})
-  @Exclude()
   role: ROLE;
+ 
+  @OneToMany(() => ProductEntity, (productEntity) => productEntity.users)
+  products: ProductEntity[];
 }
 
