@@ -6,10 +6,13 @@ export class UpdateUserDto {
     email: string;
 
     @IsNotEmpty()
-    firstname: string;
+    firstName: string;
 
     @IsNotEmpty()
-    lastname: string;
+    lastName: string;
+    
+    @IsNotEmpty()
+    passWord: string;
 
     role: ROLE;
 }

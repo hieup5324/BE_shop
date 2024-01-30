@@ -27,7 +27,9 @@ export class UserEntity {
   @Column({ default: ROLE.USER})
   role: ROLE;
  
-  @OneToMany(() => ProductEntity, (productEntity) => productEntity.users)
-  products: ProductEntity[];
+  @OneToMany(() => ProductEntity, (productEntity) => productEntity.user, {
+    cascade: true,
+  })
+  product: ProductEntity[];
 }
 

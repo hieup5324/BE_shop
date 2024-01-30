@@ -1,5 +1,6 @@
-import { UserEntity } from 'src/user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Transform } from 'class-transformer';
+import { UserEntity } from './../user/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity()
 export class ProductEntity {
@@ -20,6 +21,13 @@ export class ProductEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity,(userEntity)=> userEntity.products)
-  users: UserEntity;
+  @Column()
+  user_id: number;
+
+  @ManyToOne(() => UserEntity,(userEntity)=> userEntity.product, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
+  @Transform(({ obj }) => obj.user.id)
+  user: UserEntity;
 }

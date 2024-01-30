@@ -13,8 +13,10 @@ export class AuthService {
         if(userByEmail){
             throw new BadRequestException('email ton tai');
         }
-        const hashedPw = await bcrypt.hash(requestBody.password, 10);
-        requestBody.password = hashedPw;
+
+        const hashedPw = await bcrypt.hash(requestBody.passWord, 10);
+        requestBody.passWord = hashedPw;
+
         const saveUser = await this.userService.create(requestBody);
         const payload = {
             id: saveUser.id,
@@ -38,7 +40,8 @@ export class AuthService {
         if(!userByEmail){
             throw new BadRequestException('tai khoan khong ton tai');
         }
-        const checkpw = await bcrypt.compare(requestBody.password, userByEmail.passWord);
+        const checkpw = await bcrypt.compare(requestBody.passWord, userByEmail.passWord);
+        console.log(requestBody.passWord)
         if(!checkpw){
             throw new BadRequestException('sai mat khau')
         }

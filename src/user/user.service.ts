@@ -5,13 +5,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from './userDTO/updateUser.dto';
 import { RegisterUserDto } from './userDTO/registerUser.dto';
 import { Permission } from './checkPermission.service';
+import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class UserService {
     constructor(@InjectRepository(UserEntity) private usersRepo: Repository<UserEntity>) {}
 
+    
     create(requestbody: RegisterUserDto){
         const user = this.usersRepo.create(requestbody);
- 
+        
         return this.usersRepo.save(user);
     }
     findAll(){
@@ -28,8 +31,8 @@ export class UserService {
     findByEmail(email: string){
         return  this.usersRepo.findOneBy({ email });
     }
-    async updateById(id: number,requestbody:UpdateUserDto, currentUser: UserEntity){
-        if (requestbody.role){
+    async updateById(id: number,requestBody:UpdateUserDto, currentUser: UserEntity){
+        if (requestBody.role){
             throw new BadRequestException('khong co quyen doi role')
         }
         let user = await this.findById(id)
@@ -38,8 +41,14 @@ export class UserService {
         }
 
         Permission.check(id , currentUser);
-        user = { ...user, ...requestbody};
 
+        if (requestBody.passWord) {
+            const hashedPw = await bcrypt.hash(requestBody.passWord, 10);
+            requestBody.passWord = hashedPw;
+        }
+    
+        user = { ...user, ...requestBody};
+        
         const updateUser = await this.usersRepo.save(user);
 
         return {
@@ -56,4 +65,5 @@ export class UserService {
         Permission.check(id , currentUser);
         return this.usersRepo.remove(user);
     }
+    
 }

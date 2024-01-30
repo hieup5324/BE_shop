@@ -14,38 +14,45 @@ import { UpdateUserDto } from './userDTO/updateUser.dto';
 export class UserController {
     constructor(private userService: UserService, private authService : AuthService){}
 
+    @Post('/register')
+    registerUser(@Body() requestbody: RegisterUserDto){
+        return this.authService.register(requestbody);
+    }
+
+    @Post('/login')
+    LoginUser(@Body() requestbody: LoginUserDto){
+        return this.authService.login(requestbody);
+    }
+
     @Get()
     @UseGuards(new RoleGuard(['ADMIN', 'USER']))
     @UseGuards(AuthGuard)
     getAllUser() {
         return this.userService.findAll();
     }
+
     @Get('/getuser/:id')
     getUser(@Param('id') id: number){
         return this.userService.findById(id);
     }
+
     @Get('/current-user')
     @UseGuards(AuthGuard)
     getCurrentUser(@currentUser() currentUser : UserEntity) {
         return currentUser;
     }
+
     @Put('/update/:id')
     @UseGuards(new RoleGuard(['ADMIN', 'USER']))
     @UseGuards(AuthGuard)
     updateUser(@Param('id' , ParseIntPipe) id:number , @Body() requestbody: UpdateUserDto, @currentUser()  currentUser: UserEntity){
         return this.userService.updateById(id,requestbody,currentUser);
     }
+    
     @Delete('/delete/:id')
     @UseGuards(AuthGuard)
     deleteById(@Param('id' , ParseIntPipe) id:number ,@currentUser() currentUser : UserEntity){
         return this.userService.deleteById(id, currentUser);
     }
-    @Post('/register')
-    registerUser(@Body() requestbody: RegisterUserDto){
-        return this.authService.register(requestbody);
-    }
-    @Post('/login')
-    LoginUser(@Body() requestbody: LoginUserDto){
-        return this.authService.login(requestbody);
-    }
+    
 }
