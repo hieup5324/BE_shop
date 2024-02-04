@@ -1,12 +1,14 @@
 import { IsNotEmpty, Length, MaxLength } from 'class-validator';
 
-export class createProductDto {
+export class UpdateGroupDto {
   @IsNotEmpty()
   @Length(1, 20)
-  nameProduct: string;
+  nameGroup: string;
 
   @MaxLength(250, {
     message: 'mo ta qua dai',
   })
-  nameDescription: string;
+  desGroup: string;
+
+  userId: number;
 }

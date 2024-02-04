@@ -1,18 +1,21 @@
-import { IsEmail, IsNotEmpty } from "class-validator";
-import { ROLE } from "../user.entity";
+import { IsEmail, IsNotEmpty } from 'class-validator';
+import { ROLE } from '../userEntity/user.entity';
+import { GroupEntity } from 'src/group/group.entity';
 
 export class UpdateUserDto {
-    @IsEmail()
-    email: string;
+  @IsEmail()
+  email: string;
 
-    @IsNotEmpty()
-    firstName: string;
+  @IsNotEmpty()
+  firstName: string;
 
-    @IsNotEmpty()
-    lastName: string;
-    
-    @IsNotEmpty()
-    passWord: string;
+  @IsNotEmpty()
+  lastName: string;
 
-    role: ROLE;
+  @IsNotEmpty()
+  passWord: string;
+
+  role: ROLE;
+
+  group_id: number;
 }
