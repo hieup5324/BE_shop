@@ -7,6 +7,7 @@ import { UserEntity } from 'src/user/userEntity/user.entity';
 import { UserService } from 'src/user/user.service';
 import { UserGroupEntity } from 'src/user/userEntity/user-group.entity';
 import { GroupEntity } from 'src/group/group.entity';
+import { UserRepository } from 'src/user/user.repository';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { GroupEntity } from 'src/group/group.entity';
       UserGroupEntity,
     ]),
   ],
-  providers: [ProductService, UserService],
+  providers: [ProductService, UserService, UserRepository],
   controllers: [ProductController],
 })
 export class ProductModule {}

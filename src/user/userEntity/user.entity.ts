@@ -9,7 +9,6 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
-  JoinColumn,
   OneToOne,
 } from 'typeorm';
 
@@ -22,18 +21,21 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ unique: true, type: 'nvarchar' })
   email: string;
 
-  @Column()
+  @Column({ type: 'nvarchar' })
   @Exclude()
   passWord: string;
 
-  @Column()
+  @Column({ type: 'nvarchar' })
   firstName: string;
 
-  @Column()
+  @Column({ type: 'nvarchar' })
   lastName: string;
+
+  @Column({ type: 'int' })
+  age: number;
 
   @Column({ default: ROLE.USER })
   role: ROLE;
@@ -41,7 +43,6 @@ export class UserEntity {
   @OneToOne(() => CardEntity, (card) => card.user, {
     cascade: true,
   })
-  @JoinColumn()
   card: CardEntity;
 
   @OneToMany(() => ProductEntity, (productEntity) => productEntity.user, {

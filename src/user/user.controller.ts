@@ -48,7 +48,33 @@ export class UserController {
   @UseGuards(new RoleGuard(['ADMIN', 'USER']))
   @UseGuards(AuthGuard)
   getAllUser() {
-    return this.userService.findAll();
+    return this.userService.findAllUser();
+  }
+
+  @Get('/admin')
+  @UseGuards(new RoleGuard(['ADMIN']))
+  @UseGuards(AuthGuard)
+  getAllAdmin() {
+    return this.userService.findAllAdmin();
+  }
+
+  @Get('/role_count')
+  @UseGuards(new RoleGuard(['ADMIN']))
+  @UseGuards(AuthGuard)
+  groupByRoleCount() {
+    return this.userService.groupByRoleCount();
+  }
+
+  @Get('/product')
+  // @UseGuards(AuthGuard)
+  userProduct() {
+    return this.userService.userProduct();
+  }
+
+  @Get('/group')
+  // @UseGuards(AuthGuard)
+  userGroup() {
+    return this.userService.userGroup();
   }
 
   @Get('/getuser/:id')

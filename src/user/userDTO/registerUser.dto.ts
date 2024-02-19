@@ -29,4 +29,6 @@ export class RegisterUserDto {
   })
   @IsNotEmpty()
   lastName: string;
+
+  age: number;
 }

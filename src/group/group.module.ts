@@ -6,12 +6,18 @@ import { GroupEntity } from './group.entity';
 import { UserEntity } from 'src/user/userEntity/user.entity';
 import { UserService } from 'src/user/user.service';
 import { UserGroupEntity } from 'src/user/userEntity/user-group.entity';
+import { UserRepository } from 'src/user/user.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([GroupEntity, UserEntity, UserGroupEntity]),
+    TypeOrmModule.forFeature([
+      GroupEntity,
+      UserRepository,
+      UserGroupEntity,
+      UserEntity,
+    ]),
   ],
-  providers: [GroupService, UserService],
+  providers: [GroupService, UserService, UserRepository],
   controllers: [GroupController],
 })
 export class GroupModule {}

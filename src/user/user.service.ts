@@ -10,17 +10,13 @@ import { UpdateUserDto } from './userDTO/updateUser.dto';
 import { RegisterUserDto } from './userDTO/registerUser.dto';
 import { Permission } from './checkPermission.service';
 import * as bcrypt from 'bcrypt';
-import { GroupEntity } from 'src/group/group.entity';
-import { currentUser } from './decorators/currentUser.decorator';
-import { create } from 'domain';
-import { async } from 'rxjs';
 import { UserGroupEntity } from './userEntity/user-group.entity';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity) private usersRepo: Repository<UserEntity>,
-    @InjectRepository(GroupEntity) private groupRepo: Repository<GroupEntity>,
+    private readonly usersRepo: UserRepository,
     @InjectRepository(UserGroupEntity)
     private usergroupRepo: Repository<UserGroupEntity>,
   ) {}
@@ -30,10 +26,24 @@ export class UserService {
     return this.usersRepo.save(user);
   }
 
-  findAll() {
-    return this.usersRepo.find();
+  findAllUser() {
+    return this.usersRepo.findAllUsers();
   }
 
+  findAllAdmin() {
+    return this.usersRepo.findAllAdmin();
+  }
+
+  groupByRoleCount() {
+    return this.usersRepo.groupByRoleCount();
+  }
+
+  userProduct() {
+    return this.usersRepo.userProduct();
+  }
+  userGroup() {
+    return this.usersRepo.userGroup();
+  }
   async findById(id: number) {
     const user = await this.usersRepo.findOneBy({ id });
     if (!user) {

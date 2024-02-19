@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,13 +7,18 @@ import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductModule } from './product/product.module';
 import { ProductEntity } from './product/product.entity';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from './filter/allException.filter';
 import { GroupModule } from './group/group.module';
 import { GroupEntity } from './group/group.entity';
 import { UserGroupEntity } from './user/userEntity/user-group.entity';
 import { CardEntity } from './card/card.entity';
 import { CardModule } from './card/card.module';
+import { BullModule } from '@nestjs/bull';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -38,6 +43,30 @@ import { CardModule } from './card/card.module';
       }),
       inject: [ConfigService],
     }),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get('MAIL_HOST'),
+          secure: false,
+          auth: {
+            user: configService.get('MAIL_USER'),
+            pass: configService.get('MAIL_PASSWORD'),
+          },
+        },
+        defaults: {
+          from: '"No Reply" <noreply@example.com>',
+        },
+      }),
+      inject: [ConfigService],
+    }),
     UserModule,
     ProductModule,
     GroupModule,
@@ -49,6 +78,10 @@ import { CardModule } from './card/card.module';
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
     },
   ],
 })
