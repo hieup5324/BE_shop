@@ -2,22 +2,22 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './user/userEntity/user.entity';
-import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ProductModule } from './product/product.module';
-import { ProductEntity } from './product/product.entity';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from './filter/allException.filter';
-import { GroupModule } from './group/group.module';
-import { GroupEntity } from './group/group.entity';
-import { UserGroupEntity } from './user/userEntity/user-group.entity';
-import { CardEntity } from './card/card.entity';
-import { CardModule } from './card/card.module';
 import { BullModule } from '@nestjs/bull';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { join } from 'path';
+import { CardEntity } from './modules/card/card.entity';
+import { CardModule } from './modules/card/card.module';
+import { GroupEntity } from './modules/group/group.entity';
+import { GroupModule } from './modules/group/group.module';
+import { ProductEntity } from './modules/products/entity/product.entity';
+import { ProductModule } from './modules/products/product.module';
+import { UserModule } from './modules/users/user.module';
+import { UserGroupEntity } from './modules/users/userEntity/user-group.entity';
+import { UserEntity } from './modules/users/userEntity/user.entity';
+import { CategoryEntity } from './modules/categories/entity/categories.entity';
+import { CategoryModule } from './modules/categories/categoies.module';
 
 @Module({
   imports: [
@@ -37,17 +37,23 @@ import { join } from 'path';
           GroupEntity,
           UserGroupEntity,
           CardEntity,
+          CategoryEntity,
         ],
         synchronize: true,
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
     }),
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
-      },
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configServic: ConfigService) => ({
+        redis: {
+          host: configServic.get('REDIS_HOST'),
+          port: +configServic.get('REDIS_PORT'),
+          password: configServic.get('REDIS_PASSWORD'),
+        },
+      }),
+      inject: [ConfigService],
     }),
 
     MailerModule.forRootAsync({
@@ -60,6 +66,9 @@ import { join } from 'path';
             user: configService.get('MAIL_USER'),
             pass: configService.get('MAIL_PASSWORD'),
           },
+          tls: {
+            rejectUnauthorized: false,
+          },
         },
         defaults: {
           from: '"No Reply" <noreply@example.com>',
@@ -71,6 +80,7 @@ import { join } from 'path';
     ProductModule,
     GroupModule,
     CardModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [
