@@ -1,18 +1,10 @@
 import { Exclude } from 'class-transformer';
-import { CardEntity } from 'src/modules/card/card.entity';
-import { GroupEntity } from 'src/modules/group/group.entity';
 import { ProductEntity } from 'src/modules/products/entity/product.entity';
-import {
-  Entity,
-  Column,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
-  OneToOne,
-} from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { ROLE } from '../common/users-role.enum';
 import { BaseEntityIdNumber } from 'src/common/base/entities/base.entity';
 import { CategoryEntity } from 'src/modules/categories/entity/categories.entity';
+import { OrderEntity } from 'src/modules/orders/entity/order.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntityIdNumber {
@@ -35,34 +27,19 @@ export class UserEntity extends BaseEntityIdNumber {
   @Column({ type: 'enum', enum: ROLE, default: ROLE.USER })
   role: ROLE;
 
-  @OneToOne(() => CardEntity, (card) => card.user, {
+  @OneToMany(() => ProductEntity, (productEntity) => productEntity.users, {
     cascade: true,
   })
-  card: CardEntity;
+  products: ProductEntity[];
 
-  @OneToMany(() => ProductEntity, (productEntity) => productEntity.user, {
-    cascade: true,
-  })
-  product: ProductEntity[];
-
-  @OneToMany(() => CategoryEntity, (categoryEntity) => categoryEntity.user, {
+  @OneToMany(() => CategoryEntity, (categoryEntity) => categoryEntity.users, {
     cascade: true,
   })
   categories: CategoryEntity[];
 
-  @ManyToMany(() => GroupEntity, (groupEntity) => groupEntity.user, {
-    cascade: true,
-  })
-  @JoinTable({
-    name: 'user_group',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'group_id',
-      referencedColumnName: 'id',
-    },
-  })
-  group: GroupEntity[];
+  @OneToMany(() => OrderEntity, (order) => order.updatedBy)
+  ordersUpdateBy: OrderEntity[];
+
+  @OneToMany(() => OrderEntity, (order) => order.user)
+  orders: OrderEntity[];
 }

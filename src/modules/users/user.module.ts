@@ -5,15 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './userEntity/user.entity';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { UserGroupEntity } from './userEntity/user-group.entity';
 import { UserRepository } from './user.repository';
 import { BullModule } from '@nestjs/bull';
-import { GroupEntity } from '../group/group.entity';
 import { EmailConsumer } from './consumers/email.consumer';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([GroupEntity, UserGroupEntity, UserEntity]),
+    TypeOrmModule.forFeature([UserEntity]),
     JwtModule.register({
       global: true,
       signOptions: { expiresIn: '1d' },
@@ -23,7 +21,7 @@ import { EmailConsumer } from './consumers/email.consumer';
     }),
   ],
   controllers: [UserController],
-
   providers: [UserService, AuthService, UserRepository, EmailConsumer],
+  exports: [UserService, AuthService],
 })
 export class UserModule {}

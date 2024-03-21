@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,25 +19,32 @@ import { updateProductDto } from './productDTO/updateProduct.dto';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
 import { currentUser } from '../users/decorators/currentUser.decorator';
 import { UserEntity } from '../users/userEntity/user.entity';
+import { RoleGuard } from 'src/guards/role.guard';
+import { ProductEntity } from './entity/product.entity';
+import { query } from 'express';
+import { ProductsDto } from './productDTO/productDto';
+import { SerializeIncludes } from 'src/interceptor/serializa.interceptor';
 
 @Controller('product')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(new LoggingInterceptor())
 export class ProductController {
-  constructor(private productService: ProductService) {}
+  constructor(private readonly productService: ProductService) {}
 
   @Post('/create')
+  @UseGuards(new RoleGuard(['ADMIN']))
   @UseGuards(AuthGuard)
   createProduct(
     @Body() requestBody: createProductDto,
     @currentUser() currentUser: UserEntity,
-  ) {
+  ): Promise<ProductEntity> {
     return this.productService.create(requestBody, currentUser);
   }
 
+  @SerializeIncludes(ProductsDto)
   @Get()
-  getAllProduct() {
-    return this.productService.getAll();
+  async findProductAll(@Query() query: any): Promise<ProductsDto> {
+    return await this.productService.getAll(query);
   }
 
   @Get('/:id')
@@ -45,6 +53,7 @@ export class ProductController {
   }
 
   @Put('/update/:id')
+  @UseGuards(new RoleGuard(['ADMIN']))
   @UseGuards(AuthGuard)
   updateProduct(
     @Param('id', ParseIntPipe) id: number,
@@ -55,10 +64,9 @@ export class ProductController {
   }
 
   @Delete('/delete/:id')
-  deleteProduct(
-    @Param('id', ParseIntPipe) id: number,
-    @currentUser() currentUser: UserEntity,
-  ) {
-    return this.productService.deleteProduct(id, currentUser);
+  @UseGuards(new RoleGuard(['ADMIN']))
+  @UseGuards(AuthGuard)
+  async deleteProduct(@Param('id', ParseIntPipe) id: number) {
+    return await this.productService.deleteProduct(id);
   }
 }

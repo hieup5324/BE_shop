@@ -10,16 +10,11 @@ import { UpdateUserDto } from './userDTO/updateUser.dto';
 import { RegisterUserDto } from './userDTO/registerUser.dto';
 import { Permission } from './checkPermission.service';
 import * as bcrypt from 'bcrypt';
-import { UserGroupEntity } from './userEntity/user-group.entity';
 import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly usersRepo: UserRepository,
-    @InjectRepository(UserGroupEntity)
-    private usergroupRepo: Repository<UserGroupEntity>,
-  ) {}
+  constructor(private readonly usersRepo: UserRepository) {}
 
   create(requestbody: RegisterUserDto) {
     const user = this.usersRepo.create(requestbody);
@@ -85,31 +80,6 @@ export class UserService {
       fistname: updateUser.firstName,
       lastname: updateUser.lastName,
     };
-  }
-
-  async joinGroup(
-    joinGroup: { userId: number; groupId: number },
-    currentUser: UserEntity,
-  ) {
-    const user = await this.usersRepo.findOne({
-      where: { id: joinGroup.userId },
-      relations: ['group'],
-    });
-    if (!user) {
-      throw new NotFoundException('User does not exsits');
-    }
-
-    Permission.check(joinGroup.userId, currentUser);
-
-    const checkexist = user.group.find(
-      (group) => group.id === joinGroup.groupId,
-    );
-    if (checkexist) {
-      throw new BadRequestException('User is already a member of this group');
-    }
-
-    await this.usergroupRepo.save(joinGroup);
-    return 'add successful';
   }
 
   async deleteById(id: number, currentUser: UserEntity) {

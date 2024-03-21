@@ -7,43 +7,15 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from './filter/allException.filter';
 import { BullModule } from '@nestjs/bull';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { CardEntity } from './modules/card/card.entity';
-import { CardModule } from './modules/card/card.module';
-import { GroupEntity } from './modules/group/group.entity';
-import { GroupModule } from './modules/group/group.module';
-import { ProductEntity } from './modules/products/entity/product.entity';
 import { ProductModule } from './modules/products/product.module';
 import { UserModule } from './modules/users/user.module';
-import { UserGroupEntity } from './modules/users/userEntity/user-group.entity';
-import { UserEntity } from './modules/users/userEntity/user.entity';
-import { CategoryEntity } from './modules/categories/entity/categories.entity';
 import { CategoryModule } from './modules/categories/categoies.module';
+import { OrderModule } from './modules/orders/order.module';
+import { dataSourceOptions } from 'typeorm.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('DB_HOST'),
-        port: +configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE_NAME'),
-        entities: [
-          UserEntity,
-          ProductEntity,
-          GroupEntity,
-          UserGroupEntity,
-          CardEntity,
-          CategoryEntity,
-        ],
-        synchronize: true,
-        autoLoadEntities: true,
-      }),
-      inject: [ConfigService],
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configServic: ConfigService) => ({
@@ -78,9 +50,8 @@ import { CategoryModule } from './modules/categories/categoies.module';
     }),
     UserModule,
     ProductModule,
-    GroupModule,
-    CardModule,
     CategoryModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [

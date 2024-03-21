@@ -11,8 +11,8 @@ import { UserService } from 'src/modules/users/user.service';
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
-    private userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

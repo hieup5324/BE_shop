@@ -29,8 +29,8 @@ import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
 @UseInterceptors(LoggingInterceptor)
 export class UserController {
   constructor(
-    private userService: UserService,
-    private authService: AuthService,
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {}
 
   @Post('/register')
@@ -110,14 +110,5 @@ export class UserController {
     @currentUser() currentUser: UserEntity,
   ) {
     return this.userService.deleteById(id, currentUser);
-  }
-
-  @Post('join-group')
-  @UseGuards(AuthGuard)
-  async joinGroup(
-    @Body() requestBody: { userId: number; groupId: number },
-    @currentUser() currentUser: UserEntity,
-  ) {
-    return this.userService.joinGroup(requestBody, currentUser);
   }
 }

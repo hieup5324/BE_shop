@@ -1,40 +1,35 @@
-import { Transform } from 'class-transformer';
-
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 import { UserEntity } from '../../users/userEntity/user.entity';
+import { BaseEntityIdNumber } from 'src/common/base/entities/base.entity';
+import { CategoryEntity } from 'src/modules/categories/entity/categories.entity';
+import { OrdersProductsEntity } from 'src/modules/orders/entity/order-product.entity';
 
 @Entity('product')
-export class ProductEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class ProductEntity extends BaseEntityIdNumber {
   @Column()
   nameProduct: string;
 
   @Column()
   nameDescription: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  price: number;
 
   @Column()
-  user_id: number;
+  stock: number;
 
-  @ManyToOne(() => UserEntity, (userEntity) => userEntity.product, {
+  @Column('simple-array')
+  images: string[];
+
+  @ManyToOne(() => UserEntity, (userEntity) => userEntity.products, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-  @Transform(({ obj }) => obj.user.id)
-  user: UserEntity;
+  // @Transform(({ obj }) => obj.user.id)
+  users: UserEntity;
+
+  @ManyToOne(() => CategoryEntity, (categoryEntity) => categoryEntity.products)
+  categories: CategoryEntity;
+
+  @OneToMany(() => OrdersProductsEntity, (op) => op.product)
+  products: OrdersProductsEntity[];
 }

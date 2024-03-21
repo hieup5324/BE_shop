@@ -1,27 +1,122 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
+import { DataSource, FindOptionsWhere, Repository } from 'typeorm';
 import { ProductEntity } from './entity/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createProductDto } from './productDTO/createProduct.dto';
 
 import { updateProductDto } from './productDTO/updateProduct.dto';
 import { UserEntity } from '../users/userEntity/user.entity';
+import { CategoryService } from '../categories/categoies.service';
+import { OrderStatus } from '../orders/enum/order-status.enum';
+import dataSource from 'typeorm.config';
+import { OrderService } from '../orders/order.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(ProductEntity)
-    private productRepo: Repository<ProductEntity>,
+    private readonly productRepo: Repository<ProductEntity>,
+    private readonly categoryService: CategoryService,
+    @Inject(forwardRef(() => OrderService))
+    private readonly orderService: OrderService,
   ) {}
 
-  create(requestBody: createProductDto, currentUser: UserEntity) {
+  async create(
+    requestBody: createProductDto,
+    currentUser: UserEntity,
+  ): Promise<ProductEntity> {
+    const category = await this.categoryService.findOne(
+      +requestBody.categoryId,
+    );
     const product = this.productRepo.create(requestBody);
-    product.user = currentUser;
+    product.categories = category;
+    product.users = currentUser;
     return this.productRepo.save(product);
   }
 
-  getAll() {
-    return this.productRepo.find();
+  async getAll(query: any): Promise<{ products: any[]; totalProducts; limit }> {
+    let filteredTotalProducts: number;
+    let limit: number;
+
+    if (!query.limit) {
+      limit = 5;
+    } else {
+      limit = query.limit;
+    }
+
+    const queryBuilder = dataSource
+      .getRepository(ProductEntity)
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.categories', 'category')
+      .groupBy('product.id,category.id');
+
+    const totalProducts = await queryBuilder.getCount();
+
+    if (query.search) {
+      const search = query.search;
+      queryBuilder.andWhere('product.nameProduct like :nameProduct', {
+        nameProduct: `%${search}%`,
+      });
+    }
+
+    if (query.category) {
+      queryBuilder.andWhere('category.id=:id', { id: query.category });
+    }
+    // if (query.category) {
+    //   const search = query.search;
+    //   queryBuilder.andWhere('category.title like :title', {
+    //     title: `%${search}%`,
+    //   });
+    // }
+    if (query.minPrice) {
+      queryBuilder.andWhere('product.price>=:minPrice', {
+        minPrice: query.minPrice,
+      });
+    }
+    if (query.maxPrice) {
+      queryBuilder.andWhere('product.price<=:maxPrice', {
+        maxPrice: query.maxPrice,
+      });
+    }
+
+    queryBuilder.limit(limit);
+
+    if (query.offset) {
+      queryBuilder.offset(query.offset);
+    }
+
+    const products = await queryBuilder.getRawMany();
+
+    return { products, totalProducts, limit };
+  }
+
+  async findOne(id: number) {
+    const product = await this.productRepo.findOne({
+      where: { id: id },
+      relations: {
+        users: true,
+        categories: true,
+      },
+      select: {
+        users: {
+          id: true,
+          lastName: true,
+          email: true,
+        },
+        categories: {
+          id: true,
+          title: true,
+        },
+      },
+    });
+    if (!product) throw new NotFoundException('Không tìm thấy sản phẩm.');
+    return product;
   }
 
   async findOneByOption(option: FindOptionsWhere<any>) {
@@ -30,7 +125,13 @@ export class ProductService {
   }
 
   async findById(id: number) {
-    const product = await this.productRepo.findOneBy({ id });
+    const product = await this.productRepo.findOne({
+      where: { id: id },
+      relations: {
+        categories: true,
+        users: true,
+      },
+    });
     if (!product) {
       throw new NotFoundException('sản phẩm không tồn tại');
     }
@@ -41,15 +142,18 @@ export class ProductService {
     id: number,
     requestBody: updateProductDto,
     currentUser: UserEntity,
-  ) {
-    let product = await this.findOneByOption({
-      id: id,
-      user_id: currentUser.id,
-    });
-
+  ): Promise<ProductEntity> {
+    let product = await this.findById(id);
     if (!product) {
-      throw new NotFoundException('không có product này or không có quyền');
+      throw new NotFoundException('không có sản phẩm này');
     }
+    if (requestBody.categoryId) {
+      const category = await this.categoryService.findOne(
+        +requestBody.categoryId,
+      );
+      product.categories = category;
+    }
+    product.users = currentUser;
 
     product = { ...product, ...requestBody };
 
@@ -57,14 +161,21 @@ export class ProductService {
     return updateProduct;
   }
 
-  async deleteProduct(id: number, currentUser: UserEntity) {
-    let product = await this.findOneByOption({
-      id: id,
-      user_id: currentUser.id,
-    });
-    if (!product) {
-      throw new NotFoundException('không có product này');
+  async updateStock(id: number, stock: number, status: string) {
+    let product = await this.findById(id);
+    if (status === OrderStatus.DELIVERED) {
+      product.stock -= stock;
+    } else {
+      product.stock += stock;
     }
-    return this.productRepo.remove(product);
+    product = await this.productRepo.save(product);
+    return product;
+  }
+
+  async deleteProduct(id: number) {
+    const product = await this.findOne(id);
+    const order = await this.orderService.findOneByProductId(product.id);
+    if (order) throw new BadRequestException('Sản phẩm đang được sử dụng.');
+    return await this.productRepo.remove(product);
   }
 }
