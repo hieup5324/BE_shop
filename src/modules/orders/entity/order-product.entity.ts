@@ -8,7 +8,10 @@ import { OrderEntity } from './order.entity';
 
 @Entity('order_product')
 export class OrdersProductsEntity extends BaseEntityIdNumber {
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'float',
+    default: 0,
+  })
   product_unit_price: number;
 
   @Column()

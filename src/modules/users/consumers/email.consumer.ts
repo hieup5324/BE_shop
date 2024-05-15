@@ -17,6 +17,5 @@ export class EmailConsumer {
         name: job.data['firstName'],
       },
     });
-    console.log('send email');
   }
 }

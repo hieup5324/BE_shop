@@ -19,7 +19,6 @@ import { RoleGuard } from 'src/guards/role.guard';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './orderDTO/createOrder.dto';
 import { OrderEntity } from './entity/order.entity';
-import { UpdateOrderDto } from './orderDTO/updateOrder.dto';
 import { UpdateOrderStatusDto } from './orderDTO/updateOrder-status.dto';
 
 @Controller('order')

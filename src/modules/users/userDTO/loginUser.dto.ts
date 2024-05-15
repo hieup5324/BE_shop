@@ -6,5 +6,5 @@ export class LoginUserDto {
   email: string;
 
   @IsNotEmpty({ message: 'Password is required' })
-  passWord: string;
+  password: string;
 }

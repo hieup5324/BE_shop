@@ -1,20 +1,21 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { ROLE } from '../common/users-role.enum';
 
 export class UpdateUserDto {
+  @IsString()
+  fullName: string;
+
+  dob: Date;
+
   @IsEmail()
   email: string;
 
-  @IsNotEmpty()
-  firstName: string;
+  gender: string;
 
-  @IsNotEmpty()
-  lastName: string;
+  phone: string;
 
   @IsNotEmpty()
   passWord: string;
 
   role: ROLE;
-
-  group_id: number;
 }

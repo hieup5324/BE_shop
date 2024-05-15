@@ -9,7 +9,7 @@ export class updateProductDto {
   nameDescription: string;
 
   @IsNotEmpty({ message: 'price is required' })
-  @IsNumber({ maxDecimalPlaces: 2 }, { message: 'price must be a number' })
+  @IsNumber({}, { message: 'price must be a number' })
   @IsPositive({ message: 'price must be a positive number' })
   price: number;
 

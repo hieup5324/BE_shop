@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -34,8 +35,9 @@ export class UserController {
   ) {}
 
   @Post('/register')
-  registerUser(@Body() requestbody: RegisterUserDto) {
-    return this.authService.register(requestbody);
+  async registerUser(@Body() requestbody: RegisterUserDto) {
+    console.log('dame');
+    return await this.authService.register(requestbody);
   }
 
   @Post('/login')
@@ -43,8 +45,13 @@ export class UserController {
     return this.authService.login(requestbody);
   }
 
+  @Post('/refresh-token')
+  async refreshToken(@Query('token') token: string) {
+    return this.authService.createToken(token);
+  }
+
   @Get()
-  @UseGuards(new RoleGuard(['ADMIN', 'USER']))
+  @UseGuards(new RoleGuard(['ADMIN']))
   @UseGuards(AuthGuard)
   getAllUser() {
     return this.userService.findAllUser();
@@ -79,11 +86,6 @@ export class UserController {
   @Get('/getuser/:id')
   getUser(@Param('id') id: number) {
     return this.userService.findById(id);
-  }
-
-  @Get('/name')
-  async findAll() {
-    throw new HttpException('các', HttpStatus.FORBIDDEN);
   }
 
   @Get('/current-user')

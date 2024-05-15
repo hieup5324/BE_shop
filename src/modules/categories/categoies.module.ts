@@ -6,11 +6,12 @@ import { CategoryService } from './categoies.service';
 import { UserService } from '../users/user.service';
 import { UserRepository } from '../users/user.repository';
 import { UserEntity } from '../users/userEntity/user.entity';
+import { UserModule } from '../users/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CategoryEntity, UserEntity])],
+  imports: [TypeOrmModule.forFeature([CategoryEntity, UserEntity]), UserModule],
   controllers: [CategoryController],
-  providers: [CategoryService, UserService, UserRepository],
+  providers: [CategoryService, UserRepository],
   exports: [CategoryService],
 })
 export class CategoryModule {}

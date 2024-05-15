@@ -6,13 +6,13 @@ import { OrdersProductsEntity } from 'src/modules/orders/entity/order-product.en
 
 @Entity('product')
 export class ProductEntity extends BaseEntityIdNumber {
-  @Column()
+  @Column({ unique: true })
   nameProduct: string;
 
   @Column()
   nameDescription: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({ default: 0 })
   price: number;
 
   @Column()

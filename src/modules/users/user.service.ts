@@ -14,7 +14,10 @@ import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly usersRepo: UserRepository) {}
+  constructor(
+    private readonly usersRepo: UserRepository,
+    // private readonly repo: Repository<UserEntity>,
+  ) {}
 
   create(requestbody: RegisterUserDto) {
     const user = this.usersRepo.create(requestbody);
@@ -42,7 +45,7 @@ export class UserService {
   async findById(id: number) {
     const user = await this.usersRepo.findOneBy({ id });
     if (!user) {
-      throw new NotFoundException('nice try');
+      throw new NotFoundException('Không tìm thấy người dùng');
     }
     return user;
   }
@@ -57,11 +60,11 @@ export class UserService {
     currentUser: UserEntity,
   ) {
     if (requestBody.role) {
-      throw new BadRequestException('khong co quyen doi role');
+      throw new BadRequestException('Không thể thay đổi role');
     }
     let user = await this.findById(id);
     if (!user) {
-      throw new NotFoundException('User does not exsits');
+      throw new NotFoundException('Người dùng không tồn tại');
     }
 
     Permission.check(id, currentUser);
@@ -77,15 +80,13 @@ export class UserService {
 
     return {
       email: updateUser.email,
-      fistname: updateUser.firstName,
-      lastname: updateUser.lastName,
     };
   }
 
   async deleteById(id: number, currentUser: UserEntity) {
     let user = await this.findById(id);
     if (!user) {
-      throw new NotFoundException('ko co user nay');
+      throw new NotFoundException('không tìm thấy người dùng');
     }
     Permission.check(id, currentUser);
     return this.usersRepo.remove(user);

@@ -14,7 +14,7 @@ import { updateProductDto } from './productDTO/updateProduct.dto';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { CategoryService } from '../categories/categoies.service';
 import { OrderStatus } from '../orders/enum/order-status.enum';
-import dataSource from 'typeorm.config';
+import dataSource from 'db/data-source';
 import { OrderService } from '../orders/order.service';
 
 @Injectable()
@@ -106,7 +106,6 @@ export class ProductService {
       select: {
         users: {
           id: true,
-          lastName: true,
           email: true,
         },
         categories: {

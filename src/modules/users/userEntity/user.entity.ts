@@ -8,24 +8,30 @@ import { OrderEntity } from 'src/modules/orders/entity/order.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntityIdNumber {
+  @Column({ type: 'nvarchar' })
+  fullname: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  dob: Date;
+
   @Column({ unique: true, type: 'nvarchar' })
   email: string;
 
   @Column({ type: 'nvarchar' })
+  gender: string;
+
+  @Column({ type: 'nvarchar' })
+  phone: string;
+
+  @Column({ type: 'nvarchar' })
   @Exclude()
-  passWord: string;
-
-  @Column({ type: 'nvarchar' })
-  firstName: string;
-
-  @Column({ type: 'nvarchar' })
-  lastName: string;
-
-  @Column({ type: 'int' })
-  age: number;
+  password: string;
 
   @Column({ type: 'enum', enum: ROLE, default: ROLE.USER })
   role: ROLE;
+
+  @Column({ type: 'boolean', default: true })
+  active: boolean;
 
   @OneToMany(() => ProductEntity, (productEntity) => productEntity.users, {
     cascade: true,

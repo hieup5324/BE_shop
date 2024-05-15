@@ -11,11 +11,38 @@ import { ProductModule } from './modules/products/product.module';
 import { UserModule } from './modules/users/user.module';
 import { CategoryModule } from './modules/categories/categoies.module';
 import { OrderModule } from './modules/orders/order.module';
-import { dataSourceOptions } from 'typeorm.config';
+import { OrderEntity } from './modules/orders/entity/order.entity';
+import { ProductEntity } from './modules/products/entity/product.entity';
+import { UserEntity } from './modules/users/userEntity/user.entity';
+import { CategoryEntity } from './modules/categories/entity/categories.entity';
+import { OrdersProductsEntity } from './modules/orders/entity/order-product.entity';
+import { ShippingEntity } from './modules/orders/entity/shipping.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(dataSourceOptions),
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get('DB_HOST'),
+        port: +configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_DATABASE_NAME'),
+        entities: [
+          UserEntity,
+          ProductEntity,
+          CategoryEntity,
+          OrderEntity,
+          OrdersProductsEntity,
+          ShippingEntity,
+        ],
+        synchronize: true,
+        autoLoadEntities: true,
+      }),
+      inject: [ConfigService],
+    }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configServic: ConfigService) => ({
