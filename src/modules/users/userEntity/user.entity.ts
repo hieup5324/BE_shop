@@ -27,11 +27,11 @@ export class UserEntity extends BaseEntityIdNumber {
   @Exclude()
   password: string;
 
-  @Column({ type: 'enum', enum: ROLE, default: ROLE.USER })
-  role: ROLE;
-
   @Column({ type: 'boolean', default: true })
   active: boolean;
+
+  @Column({ type: 'enum', enum: ROLE, default: ROLE.USER })
+  role: ROLE;
 
   @OneToMany(() => ProductEntity, (productEntity) => productEntity.users, {
     cascade: true,

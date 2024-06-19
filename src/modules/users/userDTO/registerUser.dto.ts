@@ -42,9 +42,9 @@ export class RegisterUserDto {
   @IsString()
   password: string;
 
-  role: ROLE;
-
   @IsBoolean()
   @IsOptional()
   active: boolean;
+
+  role: ROLE;
 }

@@ -8,15 +8,11 @@ import { RegisterUserDto } from './userDTO/registerUser.dto';
 import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './userDTO/loginUser.dto';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     private userService: UserService,
-    @InjectQueue('send-email')
-    private sendMail: Queue,
   ) {}
   async register(requestBody: RegisterUserDto) {
     const user = await this.userService.findByEmail(requestBody.email);
@@ -26,19 +22,6 @@ export class AuthService {
     if (requestBody.role) {
       throw new BadRequestException('Không có quyền chọn Role');
     }
-    await this.sendMail.add(
-      'register',
-      {
-        to: requestBody.email,
-        subject: 'Welcome to my shop',
-        html: ` <p>Hi ${requestBody.fullname}, We understand that finding the perfect computer is more than just a purchase; it's an investment in your productivity, creativity, and enjoyment. That's why we're committed to offering a wide range of high-quality computers, accessories, and exceptional service to meet your needs.</p>
-                <p>If you need additional assistance, or you received this email in error, please contact us at <a href="mminhvcvc1@gmail.com">Email</a></p>`,
-        name: requestBody.fullname,
-      },
-      {
-        removeOnComplete: true,
-      },
-    );
     const hashedPw = await bcrypt.hash(requestBody.password, 10);
 
     requestBody.password = hashedPw;

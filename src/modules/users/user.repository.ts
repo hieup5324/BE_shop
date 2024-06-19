@@ -22,6 +22,7 @@ export class UserRepository extends Repository<UserEntity> {
         'email',
         'gender',
         'phone',
+        'active',
         'role',
       ],
     });

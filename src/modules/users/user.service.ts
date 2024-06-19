@@ -11,6 +11,7 @@ import { RegisterUserDto } from './userDTO/registerUser.dto';
 import { Permission } from './checkPermission.service';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
+import { ROLE } from './common/users-role.enum';
 
 @Injectable()
 export class UserService {
@@ -59,7 +60,7 @@ export class UserService {
     requestBody: UpdateUserDto,
     currentUser: UserEntity,
   ) {
-    if (requestBody.role) {
+    if (requestBody.role !== ROLE.USER) {
       throw new BadRequestException('Không thể thay đổi role');
     }
     let user = await this.findById(id);
@@ -69,9 +70,9 @@ export class UserService {
 
     Permission.check(id, currentUser);
 
-    if (requestBody.passWord) {
-      const hashedPw = await bcrypt.hash(requestBody.passWord, 10);
-      requestBody.passWord = hashedPw;
+    if (requestBody.password) {
+      const hashedPw = await bcrypt.hash(requestBody.password, 10);
+      requestBody.password = hashedPw;
     }
 
     user = { ...user, ...requestBody };
@@ -79,7 +80,7 @@ export class UserService {
     const updateUser = await this.usersRepo.save(user);
 
     return {
-      email: updateUser.email,
+      msg: 'Cập nhật thành công',
     };
   }
 
@@ -89,6 +90,9 @@ export class UserService {
       throw new NotFoundException('không tìm thấy người dùng');
     }
     Permission.check(id, currentUser);
-    return this.usersRepo.remove(user);
+    await this.usersRepo.remove(user);
+    return {
+      msg: 'Xóa người dùng thành công',
+    };
   }
 }

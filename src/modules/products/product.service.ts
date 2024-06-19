@@ -41,6 +41,7 @@ export class ProductService {
   }
 
   async getAll(query: any): Promise<{ products: any[]; totalProducts; limit }> {
+    console.log(query);
     let filteredTotalProducts: number;
     let limit: number;
 
@@ -64,16 +65,12 @@ export class ProductService {
         nameProduct: `%${search}%`,
       });
     }
-
     if (query.category) {
-      queryBuilder.andWhere('category.id=:id', { id: query.category });
+      const category = query.category;
+      queryBuilder.andWhere('category.title  like :title', {
+        title: `%${category}%`,
+      });
     }
-    // if (query.category) {
-    //   const search = query.search;
-    //   queryBuilder.andWhere('category.title like :title', {
-    //     title: `%${search}%`,
-    //   });
-    // }
     if (query.minPrice) {
       queryBuilder.andWhere('product.price>=:minPrice', {
         minPrice: query.minPrice,

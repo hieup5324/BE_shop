@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -24,7 +25,6 @@ import { UserEntity } from './userEntity/user.entity';
 import { RoleGuard } from 'src/guards/role.guard';
 import { UpdateUserDto } from './userDTO/updateUser.dto';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
-
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(LoggingInterceptor)
@@ -36,7 +36,6 @@ export class UserController {
 
   @Post('/register')
   async registerUser(@Body() requestbody: RegisterUserDto) {
-    console.log('dame');
     return await this.authService.register(requestbody);
   }
 
@@ -94,7 +93,7 @@ export class UserController {
     return currentUser;
   }
 
-  @Put('/update/:id')
+  @Patch('/update/:id')
   @UseGuards(new RoleGuard(['ADMIN', 'USER']))
   @UseGuards(AuthGuard)
   updateUser(

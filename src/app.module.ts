@@ -5,8 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from './filter/allException.filter';
-import { BullModule } from '@nestjs/bull';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { ProductModule } from './modules/products/product.module';
 import { UserModule } from './modules/users/user.module';
 import { CategoryModule } from './modules/categories/categoies.module';
@@ -17,6 +15,7 @@ import { UserEntity } from './modules/users/userEntity/user.entity';
 import { CategoryEntity } from './modules/categories/entity/categories.entity';
 import { OrdersProductsEntity } from './modules/orders/entity/order-product.entity';
 import { ShippingEntity } from './modules/orders/entity/shipping.entity';
+import { ChatSocketModule } from './modules/chat-socket/chat-socket.module';
 
 @Module({
   imports: [
@@ -43,42 +42,11 @@ import { ShippingEntity } from './modules/orders/entity/shipping.entity';
       }),
       inject: [ConfigService],
     }),
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configServic: ConfigService) => ({
-        redis: {
-          host: configServic.get('REDIS_HOST'),
-          port: +configServic.get('REDIS_PORT'),
-          password: configServic.get('REDIS_PASSWORD'),
-        },
-      }),
-      inject: [ConfigService],
-    }),
-
-    MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        transport: {
-          host: configService.get('MAIL_HOST'),
-          secure: false,
-          auth: {
-            user: configService.get('MAIL_USER'),
-            pass: configService.get('MAIL_PASSWORD'),
-          },
-          tls: {
-            rejectUnauthorized: false,
-          },
-        },
-        defaults: {
-          from: '"No Reply" <noreply@example.com>',
-        },
-      }),
-      inject: [ConfigService],
-    }),
     UserModule,
     ProductModule,
     CategoryModule,
     OrderModule,
+    ChatSocketModule,
   ],
   controllers: [AppController],
   providers: [
