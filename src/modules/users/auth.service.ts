@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { RegisterUserDto } from './userDTO/registerUser.dto';
 import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt';
+import * as nodemailer from 'nodemailer';
 import { LoginUserDto } from './userDTO/loginUser.dto';
 @Injectable()
 export class AuthService {
@@ -25,13 +26,12 @@ export class AuthService {
     const hashedPw = await bcrypt.hash(requestBody.password, 10);
 
     requestBody.password = hashedPw;
-    console.log(requestBody);
+    this.sendMail(requestBody.email);
     const User = await this.userService.create(requestBody);
     const payload = {
       id: User.id,
       email: User.email,
     };
-
     const access_token = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
     });
@@ -94,5 +94,25 @@ export class AuthService {
     });
 
     return { access_token: newToken };
+  }
+
+  async sendMail(email: string) {
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST,
+      port: +process.env.MAIL_PORT,
+      secure: false,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASSWORD,
+      },
+    });
+    await transporter.sendMail({
+      from: '"Shop Lap" <mminhvcvc1@gmail.com>',
+      to: email,
+      subject: 'Hello new user',
+      html:
+        '<b>Hello new user?</b>' +
+        '<p>Chúc mừng bạn đã đăng ký thành công tài khoản tại Shop Lap!</p>',
+    });
   }
 }

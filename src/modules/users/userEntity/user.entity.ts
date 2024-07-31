@@ -23,8 +23,8 @@ export class UserEntity extends BaseEntityIdNumber {
   @Column({ type: 'nvarchar' })
   phone: string;
 
-  @Column({ type: 'nvarchar' })
   @Exclude()
+  @Column({ type: 'nvarchar' })
   password: string;
 
   @Column({ type: 'boolean', default: true })

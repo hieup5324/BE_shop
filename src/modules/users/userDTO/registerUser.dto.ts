@@ -1,50 +1,45 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsDateString,
   IsEmail,
   IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
 import { ROLE } from '../common/users-role.enum';
+import { TransformToBoolean } from 'src/decorators/tranform-to-boolean.decorator';
 
 export class RegisterUserDto {
-  @ApiProperty({
-    description: 'firtname',
-    example: 'hieu',
-  })
-  @IsNotEmpty({ message: 'First name is required' })
-  @IsString({ message: 'First name must be a string' })
+  @IsNotEmpty()
+  @IsString()
   fullname: string;
 
   @IsNotEmpty()
   dob: Date;
 
   @IsNotEmpty()
+  @IsString()
   gender: string;
 
   @IsNotEmpty()
+  @IsString()
   phone: string;
 
-  @ApiProperty({
-    description: 'email',
-    example: 'hieup5324@gmail.com',
-  })
-  @IsEmail({}, { message: 'Please provide a valid email address' })
-  @IsNotEmpty({ message: 'Email is required' })
+  @ApiProperty()
+  @IsEmail()
+  @IsNotEmpty()
   email: string;
 
-  @ApiProperty({
-    description: 'password',
-    example: '123',
-  })
-  @IsNotEmpty({ message: 'Password is required' })
+  @IsNotEmpty()
   @IsString()
   password: string;
 
   @IsBoolean()
   @IsOptional()
+  @TransformToBoolean()
   active: boolean;
 
+  @IsOptional()
   role: ROLE;
 }
