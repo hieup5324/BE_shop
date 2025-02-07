@@ -16,6 +16,7 @@ import { CategoryEntity } from './modules/categories/entity/categories.entity';
 import { OrdersProductsEntity } from './modules/orders/entity/order-product.entity';
 import { ShippingEntity } from './modules/orders/entity/shipping.entity';
 import { ChatSocketModule } from './modules/chat-socket/chat-socket.module';
+import { GoogleModule } from './modules/google/google.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ChatSocketModule } from './modules/chat-socket/chat-socket.module';
     CategoryModule,
     OrderModule,
     ChatSocketModule,
+    GoogleModule,
   ],
   controllers: [AppController],
   providers: [

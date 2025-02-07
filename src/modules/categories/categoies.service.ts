@@ -3,8 +3,8 @@ import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { CategoryEntity } from './entity/categories.entity';
-import { createCategoryDto } from './categoriesDTO/createCategory.dto';
-import { updateCategoryDto } from './categoriesDTO/updateCategory.dto';
+import { createCategoryDto } from './categoriesDTO/create-category.dto';
+import { updateCategoryDto } from './categoriesDTO/update-category.dto';
 
 @Injectable()
 export class CategoryService {

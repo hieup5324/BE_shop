@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
-import { currentUser } from '../users/decorators/currentUser.decorator';
+import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { RoleGuard } from 'src/guards/role.guard';
 import { OrderService } from './order.service';

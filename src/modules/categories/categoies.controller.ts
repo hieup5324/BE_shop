@@ -13,10 +13,10 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
-import { currentUser } from '../users/decorators/currentUser.decorator';
+import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { UserEntity } from '../users/userEntity/user.entity';
-import { createCategoryDto } from './categoriesDTO/createCategory.dto';
-import { updateCategoryDto } from './categoriesDTO/updateCategory.dto';
+import { createCategoryDto } from './categoriesDTO/create-category.dto';
+import { updateCategoryDto } from './categoriesDTO/update-category.dto';
 import { CategoryService } from './categoies.service';
 import { RoleGuard } from 'src/guards/role.guard';
 

@@ -8,27 +8,85 @@ import { OrderEntity } from 'src/modules/orders/entity/order.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntityIdNumber {
-  @Column({ type: 'nvarchar' })
-  fullname: string;
-
-  @Column({ type: 'timestamp', nullable: true })
-  dob: Date;
-
-  @Column({ unique: true, type: 'nvarchar' })
-  email: string;
-
-  @Column({ type: 'nvarchar' })
-  gender: string;
-
-  @Column({ type: 'nvarchar' })
-  phone: string;
-
-  @Exclude()
-  @Column({ type: 'nvarchar' })
+  @Column({
+    type: 'varchar',
+    length: 128,
+    name: 'password',
+  })
   password: string;
 
-  @Column({ type: 'boolean', default: true })
-  active: boolean;
+  @Column({
+    type: 'varchar',
+    length: 128,
+    name: 'auth0user_id',
+    nullable: true,
+  })
+  auth0userId?: string;
+
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'first_name',
+  })
+  firstName: string;
+
+  @Column({
+    type: 'varchar',
+    length: 255,
+    charset: 'utf8mb4',
+    collation: 'utf8mb4_unicode_ci',
+    name: 'last_name',
+  })
+  lastName: string;
+
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'phone',
+    nullable: true,
+  })
+  phone?: string;
+
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'type',
+    nullable: true,
+  })
+  type?: string;
+
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'address',
+    nullable: true,
+  })
+  address?: string;
+
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'photo_url',
+    nullable: true,
+  })
+  photoUrl?: string;
+
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'email',
+  })
+  email: string;
+
+  @Column({
+    type: 'date',
+    name: 'date_of_birth',
+    nullable: true,
+  })
+  dateOfBirth?: Date;
+
+  @Column({ type: 'varchar', nullable: true })
+  auth0user_token?: string;
 
   @Column({ type: 'enum', enum: ROLE, default: ROLE.USER })
   role: ROLE;

@@ -17,7 +17,7 @@ import { createProductDto } from './productDTO/createProduct.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { updateProductDto } from './productDTO/updateProduct.dto';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
-import { currentUser } from '../users/decorators/currentUser.decorator';
+import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { RoleGuard } from 'src/guards/role.guard';
 import { ProductEntity } from './entity/product.entity';

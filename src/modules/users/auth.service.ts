@@ -16,17 +16,18 @@ export class AuthService {
     private userService: UserService,
   ) {}
   async register(requestBody: RegisterUserDto) {
-    const user = await this.userService.findByEmail(requestBody.email);
+    let { email, password } = requestBody;
+    const user = await this.userService.findByEmail(email);
     if (user) {
       throw new BadRequestException('Email đã tồn tại');
     }
     if (requestBody.role) {
       throw new BadRequestException('Không có quyền chọn Role');
     }
-    const hashedPw = await bcrypt.hash(requestBody.password, 10);
+    const hashedPw = await bcrypt.hash(password, 10);
 
     requestBody.password = hashedPw;
-    this.sendMail(requestBody.email);
+    // this.sendMail(requestBody.email);
     const User = await this.userService.create(requestBody);
     const payload = {
       id: User.id,
@@ -48,11 +49,12 @@ export class AuthService {
   }
 
   async login(requestBody: LoginUserDto) {
-    const user = await this.userService.findByEmail(requestBody.email);
+    const { email, password } = requestBody;
+    const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new BadRequestException('tài khoản không tồn tại');
     }
-    const checkpw = await bcrypt.compare(requestBody.password, user.password);
+    const checkpw = await bcrypt.compare(password, user.password);
     if (!checkpw) {
       throw new BadRequestException('sai mật khẩu');
     }

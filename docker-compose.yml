@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    container_name: database
+    ports:
+      - 33011:3306
+    volumes:
+      - be_shop:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'be_shop'
+      MYSQL_ROOT_PASSWORD: 'user'
+    networks:
+      - be_shop
+
+volumes:
+  be_shop:
+
+networks:
+  be_shop:

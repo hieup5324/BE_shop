@@ -7,11 +7,12 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ROLE } from '../common/users-role.enum';
+import { Transform } from 'class-transformer';
 import { TransformTrimSpace } from 'src/modules/shared/decorators/transform-trim-space.decorator';
+import { ROLE } from '../common/users-role.enum';
 import { USER_TYPE } from 'src/modules/shared/constants/common';
 
-export class RegisterUserDto {
+export class RegisterUser {
   @TransformTrimSpace()
   @IsNotEmpty()
   @IsEmail()
@@ -57,5 +58,5 @@ export class RegisterUserDto {
   dateOfBirth?: Date;
 
   @IsOptional()
-  role: ROLE;
+  roles: ROLE;
 }

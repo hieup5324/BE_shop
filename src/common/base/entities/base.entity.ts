@@ -11,14 +11,15 @@ export class BaseEntityIdNumber {
   @PrimaryGeneratedColumn()
   id?: any;
 
-  @CreateDateColumn({ type: 'timestamp', nullable: true })
-  createdAt?: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-  @Exclude()
-  @UpdateDateColumn({ type: 'timestamp', nullable: true })
-  updatedAt?: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
-  @Exclude()
-  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  @DeleteDateColumn({
+    name: 'deleted_at',
+    nullable: true,
+  })
   deletedAt?: Date;
 }

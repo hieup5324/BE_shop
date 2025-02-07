@@ -25,9 +25,9 @@ export class UserService {
     return this.usersRepo.save(user);
   }
 
-  findAllUser() {
-    return this.usersRepo.findAllUsers();
-  }
+  // findAllUser() {
+  //   return this.usersRepo.findAllUsers();
+  // }
 
   findAllAdmin() {
     return this.usersRepo.findAllAdmin();

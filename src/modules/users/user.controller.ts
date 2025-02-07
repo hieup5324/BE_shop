@@ -20,7 +20,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './userDTO/registerUser.dto';
 import { LoginUserDto } from './userDTO/loginUser.dto';
-import { currentUser } from './decorators/currentUser.decorator';
+import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { UserEntity } from './userEntity/user.entity';
 import { RoleGuard } from 'src/guards/role.guard';
 import { UpdateUserDto } from './userDTO/updateUser.dto';
@@ -34,7 +34,7 @@ export class UserController {
     private readonly authService: AuthService,
   ) {}
 
-  @Post('/register')
+  @Post()
   async registerUser(@Body() requestbody: RegisterUserDto) {
     return await this.authService.register(requestbody);
   }
@@ -49,12 +49,12 @@ export class UserController {
     return this.authService.createToken(token);
   }
 
-  @Get()
-  @UseGuards(new RoleGuard(['ADMIN']))
-  @UseGuards(AuthGuard)
-  getAllUser() {
-    return this.userService.findAllUser();
-  }
+  // @Get()
+  // @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(AuthGuard)
+  // getAllUser() {
+  //   return this.userService.findAllUser();
+  // }
 
   @Get('/admin')
   @UseGuards(new RoleGuard(['ADMIN']))

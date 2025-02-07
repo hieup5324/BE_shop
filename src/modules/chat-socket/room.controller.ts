@@ -1,7 +1,7 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { currentUser } from '../users/decorators/currentUser.decorator';
+import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { RoleGuard } from 'src/guards/role.guard';
 
