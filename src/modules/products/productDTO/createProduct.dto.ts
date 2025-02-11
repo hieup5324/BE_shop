@@ -1,24 +1,22 @@
-import { IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty } from 'class-validator';
 
 export class createProductDto {
-  @IsNotEmpty({ message: 'nameProduct is required' })
-  @IsString({ message: 'nameProduct must be a string' })
-  nameProduct: string;
+  @IsNotEmpty()
+  productName: string;
 
-  @IsNotEmpty({ message: 'nameDescription is required' })
-  nameDescription: string;
+  @IsNotEmpty()
+  type: string;
 
-  @IsNotEmpty({ message: 'price is required' })
-  @IsNumber({ maxDecimalPlaces: 2 }, { message: 'price must be a number' })
-  @IsPositive({ message: 'price must be a positive number' })
+  @IsNotEmpty()
   price: number;
 
-  @IsNotEmpty({ message: 'stock is required' })
-  @IsNumber({}, { message: 'stock must be a number' })
-  stock: number;
+  description: string;
 
-  @IsNotEmpty({ message: 'images is required' })
-  images: string[];
+  photoUrl: string;
+
+  @IsNotEmpty()
+  @IsInt()
+  quantity: number;
 
   @IsNotEmpty({ message: 'category is required' })
   categoryId: number;

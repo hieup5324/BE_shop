@@ -6,14 +6,12 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 @Entity('category')
 export class CategoryEntity extends BaseEntityIdNumber {
   @Column({ unique: true, type: 'nvarchar' })
-  title: string;
+  name: string;
 
   @Column()
   description: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.categories, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => UserEntity, (user) => user.categories)
   users: UserEntity;
 
   @OneToMany(() => ProductEntity, (product) => product.categories)

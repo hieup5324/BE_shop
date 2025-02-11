@@ -4,7 +4,7 @@ export class createCategoryDto {
   @IsNotEmpty({ message: 'title khong duoc de trong' })
   @IsString()
   @Length(1, 20)
-  title: string;
+  name: string;
 
   @MaxLength(250, {
     message: 'mo ta qua dai',

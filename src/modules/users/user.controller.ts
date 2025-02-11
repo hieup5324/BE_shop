@@ -25,6 +25,7 @@ import { UserEntity } from './userEntity/user.entity';
 import { RoleGuard } from 'src/guards/role.guard';
 import { UpdateUserDto } from './userDTO/updateUser.dto';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
+import { ChangePasswordDto } from './userDTO/change-password.dto';
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(LoggingInterceptor)
@@ -42,6 +43,14 @@ export class UserController {
   @Post('/login')
   LoginUser(@Body() requestbody: LoginUserDto) {
     return this.authService.login(requestbody);
+  }
+
+  @Post('/change-password/:userId')
+  async changePassword(
+    @Param('userId') id: number,
+    @Body() userInput: ChangePasswordDto,
+  ) {
+    return this.userService.changePassword(id, userInput);
   }
 
   @Post('/refresh-token')

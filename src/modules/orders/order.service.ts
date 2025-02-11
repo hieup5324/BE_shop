@@ -116,71 +116,71 @@ export class OrderService {
   //     return product;
   //   }
 
-  async updateById(
-    id: number,
-    requestBody: UpdateOrderStatusDto,
-    currentUser: UserEntity,
-  ): Promise<OrderEntity> {
-    {
-      let order = await this.findOne(id);
-      if (!order) throw new NotFoundException('không có order này');
+  // async updateById(
+  //   id: number,
+  //   requestBody: UpdateOrderStatusDto,
+  //   currentUser: UserEntity,
+  // ): Promise<OrderEntity> {
+  //   {
+  //     let order = await this.findOne(id);
+  //     if (!order) throw new NotFoundException('không có order này');
 
-      if (
-        order.status === OrderStatus.DELIVERED ||
-        order.status === OrderStatus.CANCELLED
-      ) {
-        throw new BadRequestException(`đơn hàng ${order.status}`);
-      }
-      if (
-        order.status === OrderStatus.PROCESSING &&
-        requestBody.status != OrderStatus.SHIPPED
-      ) {
-        throw new BadRequestException(`
-        Giao hàng trước khi vận chuyển!!!`);
-      }
-      if (
-        requestBody.status === OrderStatus.SHIPPED &&
-        order.status === OrderStatus.SHIPPED
-      ) {
-        return order;
-      }
-      if (requestBody.status === OrderStatus.SHIPPED) {
-        order.shippedAt = new Date();
-      }
-      if (requestBody.status === OrderStatus.DELIVERED) {
-        order.deliveredAt = new Date();
-      }
-      order.status = requestBody.status;
-      order.updatedBy = currentUser;
-      order = await this.orderRepo.save(order);
-      if (requestBody.status === OrderStatus.DELIVERED) {
-        await this.stockUpdate(order, OrderStatus.DELIVERED);
-      }
-      return order;
-    }
-  }
-  async stockUpdate(order: OrderEntity, status: string) {
-    for (const op of order.products) {
-      await this.productService.updateStock(
-        op.product.id,
-        op.product_quantity,
-        status,
-      );
-    }
-  }
-  async cancelled(id: number, currentUser: UserEntity) {
-    let order = await this.findOne(id);
-    if (!order) throw new NotFoundException('không có order này');
-    if (order.status === OrderStatus.DELIVERED)
-      throw new BadRequestException('đơn hàng đã giao không thể hủy');
-    if (order.status === OrderStatus.CANCELLED) return order;
+  //     if (
+  //       order.status === OrderStatus.DELIVERED ||
+  //       order.status === OrderStatus.CANCELLED
+  //     ) {
+  //       throw new BadRequestException(`đơn hàng ${order.status}`);
+  //     }
+  //     if (
+  //       order.status === OrderStatus.PROCESSING &&
+  //       requestBody.status != OrderStatus.SHIPPED
+  //     ) {
+  //       throw new BadRequestException(`
+  //       Giao hàng trước khi vận chuyển!!!`);
+  //     }
+  //     if (
+  //       requestBody.status === OrderStatus.SHIPPED &&
+  //       order.status === OrderStatus.SHIPPED
+  //     ) {
+  //       return order;
+  //     }
+  //     if (requestBody.status === OrderStatus.SHIPPED) {
+  //       order.shippedAt = new Date();
+  //     }
+  //     if (requestBody.status === OrderStatus.DELIVERED) {
+  //       order.deliveredAt = new Date();
+  //     }
+  //     order.status = requestBody.status;
+  //     order.updatedBy = currentUser;
+  //     order = await this.orderRepo.save(order);
+  //     if (requestBody.status === OrderStatus.DELIVERED) {
+  //       await this.stockUpdate(order, OrderStatus.DELIVERED);
+  //     }
+  //     return order;
+  //   }
+  // }
+  // async stockUpdate(order: OrderEntity, status: string) {
+  //   for (const op of order.products) {
+  //     await this.productService.updateStock(
+  //       op.product.id,
+  //       op.product_quantity,
+  //       status,
+  //     );
+  //   }
+  // }
+  // async cancelled(id: number, currentUser: UserEntity) {
+  //   let order = await this.findOne(id);
+  //   if (!order) throw new NotFoundException('không có order này');
+  //   if (order.status === OrderStatus.DELIVERED)
+  //     throw new BadRequestException('đơn hàng đã giao không thể hủy');
+  //   if (order.status === OrderStatus.CANCELLED) return order;
 
-    order.status = OrderStatus.CANCELLED;
-    order.updatedBy = currentUser;
-    order = await this.orderRepo.save(order);
-    await this.stockUpdate(order, OrderStatus.CANCELLED);
-    return order;
-  }
+  //   order.status = OrderStatus.CANCELLED;
+  //   order.updatedBy = currentUser;
+  //   order = await this.orderRepo.save(order);
+  //   await this.stockUpdate(order, OrderStatus.CANCELLED);
+  //   return order;
+  // }
 
   async deleteOrder(id: number) {
     let order = await this.findOne(id);

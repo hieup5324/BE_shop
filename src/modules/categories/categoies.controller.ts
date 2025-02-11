@@ -20,26 +20,24 @@ import { updateCategoryDto } from './categoriesDTO/update-category.dto';
 import { CategoryService } from './categoies.service';
 import { RoleGuard } from 'src/guards/role.guard';
 
-@Controller('category')
-@UseGuards(AuthGuard)
+@Controller('categories')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(new LoggingInterceptor())
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
-  @Post('/create')
-  @UseGuards(new RoleGuard(['ADMIN']))
+  @Get()
+  getAllCategory() {
+    return this.categoryService.getAll();
+  }
+
+  @Post()
+  @UseGuards(AuthGuard, new RoleGuard(['ADMIN']))
   createCategory(
     @Body() requestBody: createCategoryDto,
     @currentUser() currentUser: UserEntity,
   ) {
     return this.categoryService.create(requestBody, currentUser);
-  }
-
-  @Get()
-  @UseGuards(new RoleGuard(['ADMIN']))
-  getAllCategory() {
-    return this.categoryService.getAll();
   }
 
   @Get('/:id')

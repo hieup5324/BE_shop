@@ -13,13 +13,13 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
-import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { RoleGuard } from 'src/guards/role.guard';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './orderDTO/createOrder.dto';
 import { OrderEntity } from './entity/order.entity';
 import { UpdateOrderStatusDto } from './orderDTO/updateOrder-status.dto';
+import { currentUser } from '../shared/decorators/currentUser.decorator';
 
 @Controller('order')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -48,26 +48,26 @@ export class OrderController {
     return await this.orderService.findOne(id);
   }
 
-  @Put('/update/:id')
-  @UseGuards(new RoleGuard(['ADMIN']))
-  @UseGuards(AuthGuard)
-  async updateProduct(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() requestBody: UpdateOrderStatusDto,
-    @currentUser() currentUser: UserEntity,
-  ) {
-    return await this.orderService.updateById(id, requestBody, currentUser);
-  }
+  // @Put('/update/:id')
+  // @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(AuthGuard)
+  // async updateProduct(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Body() requestBody: UpdateOrderStatusDto,
+  //   @currentUser() currentUser: UserEntity,
+  // ) {
+  //   return await this.orderService.updateById(id, requestBody, currentUser);
+  // }
 
-  @Put('/cancel/:id')
-  @UseGuards(new RoleGuard(['ADMIN']))
-  @UseGuards(AuthGuard)
-  async cancelled(
-    @Param('id') id: string,
-    @currentUser() currentUser: UserEntity,
-  ) {
-    return await this.orderService.cancelled(+id, currentUser);
-  }
+  // @Put('/cancel/:id')
+  // @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(AuthGuard)
+  // async cancelled(
+  //   @Param('id') id: string,
+  //   @currentUser() currentUser: UserEntity,
+  // ) {
+  //   return await this.orderService.cancelled(+id, currentUser);
+  // }
 
   @Delete('/delete/:id')
   @UseGuards(new RoleGuard(['ADMIN']))

@@ -12,6 +12,7 @@ import { Permission } from './checkPermission.service';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
 import { ROLE } from './common/users-role.enum';
+import { ChangePasswordDto } from './userDTO/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -28,6 +29,23 @@ export class UserService {
   // findAllUser() {
   //   return this.usersRepo.findAllUsers();
   // }
+
+  async changePassword(userId: number, userInput: ChangePasswordDto) {
+    const user = await this.usersRepo.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const { oldPassword, newPassword } = userInput;
+    const checkpw = await bcrypt.compare(oldPassword, user.password);
+    if (!checkpw) {
+      throw new BadRequestException('Mật khẩu cũ không đúng');
+    }
+    const hashedPw = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPw;
+    await this.usersRepo.save(user);
+    return { msg: 'Đổi mật khẩu thành công' };
+  }
 
   findAllAdmin() {
     return this.usersRepo.findAllAdmin();

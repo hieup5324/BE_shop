@@ -25,15 +25,15 @@ import { query } from 'express';
 import { ProductsDto } from './productDTO/productDto';
 import { SerializeIncludes } from 'src/interceptor/serializa.interceptor';
 
-@Controller('product')
+@Controller('products')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(new LoggingInterceptor())
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Post('/create')
-  @UseGuards(new RoleGuard(['ADMIN']))
-  @UseGuards(AuthGuard)
+  @Post()
+  // @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(AuthGuard)
   createProduct(
     @Body() requestBody: createProductDto,
     @currentUser() currentUser: UserEntity,
@@ -41,10 +41,16 @@ export class ProductController {
     return this.productService.create(requestBody, currentUser);
   }
 
-  @SerializeIncludes(ProductsDto)
+  // @SerializeIncludes(ProductsDto)
+  // @Get()
+  // async findProductAll(@Query() query: any): Promise<ProductsDto> {
+  //   return await this.productService.getAll(query);
+  // }
+
   @Get()
-  async findProductAll(@Query() query: any): Promise<ProductsDto> {
-    return await this.productService.getAll(query);
+  async getProducts(@Query('search') search: string): Promise<any> {
+    const products = await this.productService.getProducts(search);
+    return products;
   }
 
   @Get('/:id')

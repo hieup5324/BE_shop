@@ -16,12 +16,12 @@ import { CategoryService } from '../categories/categoies.service';
 import { OrderStatus } from '../orders/enum/order-status.enum';
 import dataSource from 'db/data-source';
 import { OrderService } from '../orders/order.service';
+import { ProductRepository } from './product.repository';
 
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectRepository(ProductEntity)
-    private readonly productRepo: Repository<ProductEntity>,
+    private readonly productRepo: ProductRepository,
     private readonly categoryService: CategoryService,
     @Inject(forwardRef(() => OrderService))
     private readonly orderService: OrderService,
@@ -40,57 +40,62 @@ export class ProductService {
     return this.productRepo.save(product);
   }
 
-  async getAll(query: any): Promise<{ products: any[]; totalProducts; limit }> {
-    console.log(query);
-    let filteredTotalProducts: number;
-    let limit: number;
+  // async getAll(query: any): Promise<{ products: any[]; totalProducts; limit }> {
+  //   console.log(query);
+  //   let filteredTotalProducts: number;
+  //   let limit: number;
 
-    if (!query.limit) {
-      limit = 5;
-    } else {
-      limit = query.limit;
-    }
+  //   if (!query.limit) {
+  //     limit = 5;
+  //   } else {
+  //     limit = query.limit;
+  //   }
 
-    const queryBuilder = dataSource
-      .getRepository(ProductEntity)
-      .createQueryBuilder('product')
-      .leftJoinAndSelect('product.categories', 'category')
-      .groupBy('product.id,category.id');
+  //   const queryBuilder = dataSource
+  //     .getRepository(ProductEntity)
+  //     .createQueryBuilder('product')
+  //     .leftJoinAndSelect('product.categories', 'category')
+  //     .groupBy('product.id,category.id');
 
-    const totalProducts = await queryBuilder.getCount();
+  //   const totalProducts = await queryBuilder.getCount();
 
-    if (query.search) {
-      const search = query.search;
-      queryBuilder.andWhere('product.nameProduct like :nameProduct', {
-        nameProduct: `%${search}%`,
-      });
-    }
-    if (query.category) {
-      const category = query.category;
-      queryBuilder.andWhere('category.title  like :title', {
-        title: `%${category}%`,
-      });
-    }
-    if (query.minPrice) {
-      queryBuilder.andWhere('product.price>=:minPrice', {
-        minPrice: query.minPrice,
-      });
-    }
-    if (query.maxPrice) {
-      queryBuilder.andWhere('product.price<=:maxPrice', {
-        maxPrice: query.maxPrice,
-      });
-    }
+  //   if (query.search) {
+  //     const search = query.search;
+  //     queryBuilder.andWhere('product.nameProduct like :nameProduct', {
+  //       nameProduct: `%${search}%`,
+  //     });
+  //   }
+  //   if (query.category) {
+  //     const category = query.category;
+  //     queryBuilder.andWhere('category.title  like :title', {
+  //       title: `%${category}%`,
+  //     });
+  //   }
+  //   if (query.minPrice) {
+  //     queryBuilder.andWhere('product.price>=:minPrice', {
+  //       minPrice: query.minPrice,
+  //     });
+  //   }
+  //   if (query.maxPrice) {
+  //     queryBuilder.andWhere('product.price<=:maxPrice', {
+  //       maxPrice: query.maxPrice,
+  //     });
+  //   }
 
-    queryBuilder.limit(limit);
+  //   queryBuilder.limit(limit);
 
-    if (query.offset) {
-      queryBuilder.offset(query.offset);
-    }
+  //   if (query.offset) {
+  //     queryBuilder.offset(query.offset);
+  //   }
 
-    const products = await queryBuilder.getRawMany();
+  //   const products = await queryBuilder.getRawMany();
 
-    return { products, totalProducts, limit };
+  //   return { products, totalProducts, limit };
+  // }
+
+  async getProducts(search) {
+    const products = await this.productRepo.getProducts(search);
+    return products;
   }
 
   async findOne(id: number) {
@@ -107,7 +112,7 @@ export class ProductService {
         },
         categories: {
           id: true,
-          title: true,
+          name: true,
         },
       },
     });
@@ -157,16 +162,16 @@ export class ProductService {
     return updateProduct;
   }
 
-  async updateStock(id: number, stock: number, status: string) {
-    let product = await this.findById(id);
-    if (status === OrderStatus.DELIVERED) {
-      product.stock -= stock;
-    } else {
-      product.stock += stock;
-    }
-    product = await this.productRepo.save(product);
-    return product;
-  }
+  // async updateStock(id: number, stock: number, status: string) {
+  //   let product = await this.findById(id);
+  //   if (status === OrderStatus.DELIVERED) {
+  //     product.stock -= stock;
+  //   } else {
+  //     product.stock += stock;
+  //   }
+  //   product = await this.productRepo.save(product);
+  //   return product;
+  // }
 
   async deleteProduct(id: number) {
     const product = await this.findOne(id);

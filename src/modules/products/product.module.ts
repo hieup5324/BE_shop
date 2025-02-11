@@ -8,6 +8,7 @@ import { OrderModule } from '../orders/order.module';
 import { UserRepository } from '../users/user.repository';
 import { UserService } from '../users/user.service';
 import { UserEntity } from '../users/userEntity/user.entity';
+import { ProductRepository } from './product.repository';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { UserEntity } from '../users/userEntity/user.entity';
     CategoryModule,
     forwardRef(() => OrderModule),
   ],
-  providers: [ProductService, UserService, UserRepository],
+  providers: [ProductService, UserService, UserRepository, ProductRepository],
   controllers: [ProductController],
   exports: [ProductService],
 })
