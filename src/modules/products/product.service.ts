@@ -17,6 +17,7 @@ import { OrderStatus } from '../orders/enum/order-status.enum';
 import dataSource from 'db/data-source';
 import { OrderService } from '../orders/order.service';
 import { ProductRepository } from './product.repository';
+import { ProductQuery } from './productDTO/product.query';
 
 @Injectable()
 export class ProductService {
@@ -93,9 +94,38 @@ export class ProductService {
   //   return { products, totalProducts, limit };
   // }
 
-  async getProducts(search) {
-    const products = await this.productRepo.getProducts(search);
-    return products;
+  async getProducts(query: ProductQuery): Promise<any> {
+    return await this.productRepo.getProducts(query);
+  }
+
+  async getProductsByCategory(
+    categoryId: string,
+    productName: string,
+    skip: number,
+    take: number,
+  ) {
+    const queryBuilder = this.productRepo
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.categories', 'category')
+      .skip(skip)
+      .take(take);
+
+    if (categoryId) {
+      queryBuilder.andWhere('category.id = :categoryId', { categoryId });
+    }
+
+    if (productName) {
+      queryBuilder.andWhere('product.productName LIKE :productName', {
+        productName: `%${productName}%`,
+      });
+    }
+
+    const [products, total] = await queryBuilder.getManyAndCount();
+
+    return {
+      products,
+      total,
+    };
   }
 
   async findOne(id: number) {

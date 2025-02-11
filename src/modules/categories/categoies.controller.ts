@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { createCategoryDto } from './categoriesDTO/create-category.dto';
 import { updateCategoryDto } from './categoriesDTO/update-category.dto';
 import { CategoryService } from './categoies.service';
 import { RoleGuard } from 'src/guards/role.guard';
+import { CategoryQuery } from './categoriesDTO/categories.query';
 
 @Controller('categories')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -29,6 +31,11 @@ export class CategoryController {
   @Get()
   getAllCategory() {
     return this.categoryService.getAll();
+  }
+
+  @Get('/product')
+  async getCategoryWithProduct(@Query() query: CategoryQuery) {
+    return this.categoryService.getCategoryWithProduct(query);
   }
 
   @Post()

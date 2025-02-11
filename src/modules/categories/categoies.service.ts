@@ -1,16 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { CategoryEntity } from './entity/categories.entity';
 import { createCategoryDto } from './categoriesDTO/create-category.dto';
 import { updateCategoryDto } from './categoriesDTO/update-category.dto';
+import { CategoryRepository } from './categories.repository';
+import { CategoryQuery } from './categoriesDTO/categories.query';
+import { ProductService } from '../products/product.service';
 
 @Injectable()
 export class CategoryService {
   constructor(
-    @InjectRepository(CategoryEntity)
-    private categoryRepo: Repository<CategoryEntity>,
+    private categoryRepo: CategoryRepository,
+    @Inject(forwardRef(() => ProductService))
+    private productService: ProductService,
   ) {}
 
   async create(requestBody: createCategoryDto, currentUser: UserEntity) {
@@ -21,6 +30,37 @@ export class CategoryService {
 
   getAll() {
     return this.categoryRepo.find();
+  }
+
+  async getCategoryWithProduct(query: CategoryQuery) {
+    const { search, page, page_size, product } = query;
+    const pageNumber = Number(page) || 1;
+    const pageSize = Number(page_size) || 10;
+    const skip = (pageNumber - 1) * pageSize;
+
+    const category = await this.categoryRepo.findOne({
+      where: { id: search },
+    });
+
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
+    const { products, total } = await this.productService.getProductsByCategory(
+      search,
+      product,
+      skip,
+      pageSize,
+    );
+    return {
+      data: products,
+      paging: {
+        total,
+        page: pageNumber,
+        page_size: pageSize,
+        total_pages: Math.ceil(total / pageSize),
+      },
+    };
   }
 
   async findOneByOption(option: FindOptionsWhere<any>) {
