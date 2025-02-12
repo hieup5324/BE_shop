@@ -24,21 +24,22 @@ export class RegisterUserDto {
   @TransformTrimSpace()
   @IsNotEmpty()
   @IsString()
-  firstName: string;
+  first_name: string;
 
   @TransformTrimSpace()
   @IsNotEmpty()
   @IsString()
-  lastName: string;
+  last_name: string;
 
   @IsEnum(USER_TYPE)
+  @IsOptional()
   type: string;
 
   @TransformTrimSpace()
   @IsNotEmpty()
   @IsOptional()
   @IsString()
-  photoUrl?: string;
+  photo_url?: string;
 
   @TransformTrimSpace()
   @IsNotEmpty()
@@ -46,15 +47,9 @@ export class RegisterUserDto {
   @IsNumberString()
   phone?: string;
 
-  @TransformTrimSpace()
-  @IsNotEmpty()
-  @IsOptional()
-  @IsString()
-  address?: string;
-
   @IsOptional()
   @IsDate()
-  dateOfBirth?: Date;
+  date_of_birth?: Date;
 
   @IsOptional()
   role: ROLE;

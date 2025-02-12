@@ -35,9 +35,14 @@ export class ProductService {
     const category = await this.categoryService.findOne(
       +requestBody.categoryId,
     );
+    if (!category) {
+      throw new BadRequestException('Category not found');
+    }
+
     const product = this.productRepo.create(requestBody);
     product.category = category;
     product.user = currentUser;
+
     return this.productRepo.save(product);
   }
 
@@ -106,7 +111,7 @@ export class ProductService {
   ) {
     const queryBuilder = this.productRepo
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.categories', 'category')
+      .leftJoinAndSelect('product.category', 'category')
       .skip(skip)
       .take(take);
 

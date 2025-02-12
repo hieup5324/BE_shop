@@ -22,6 +22,8 @@ import { InvoiceEntity } from './modules/invoice/invoice.entity';
 import { ReviewEntity } from './modules/reviews/review.entity';
 import { CartEntity } from './modules/cart/entity/cart.entity';
 import { CartItemEntity } from './modules/cart/entity/cart-item.entity';
+import { CartModule } from './modules/cart/cart.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import { CartItemEntity } from './modules/cart/entity/cart-item.entity';
     OrderModule,
     ChatSocketModule,
     GoogleModule,
+    CartModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

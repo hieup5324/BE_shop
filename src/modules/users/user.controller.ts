@@ -17,7 +17,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth/auth.service';
 import { RegisterUserDto } from './userDTO/registerUser.dto';
 import { LoginUserDto } from './userDTO/loginUser.dto';
 import { currentUser } from '../shared/decorators/currentUser.decorator';
@@ -30,20 +30,7 @@ import { ChangePasswordDto } from './userDTO/change-password.dto';
 @UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(LoggingInterceptor)
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly authService: AuthService,
-  ) {}
-
-  @Post()
-  async registerUser(@Body() requestbody: RegisterUserDto) {
-    return await this.authService.register(requestbody);
-  }
-
-  @Post('/login')
-  LoginUser(@Body() requestbody: LoginUserDto) {
-    return this.authService.login(requestbody);
-  }
+  constructor(private readonly userService: UserService) {}
 
   @Post('/change-password/:userId')
   async changePassword(
@@ -51,11 +38,6 @@ export class UserController {
     @Body() userInput: ChangePasswordDto,
   ) {
     return this.userService.changePassword(id, userInput);
-  }
-
-  @Post('/refresh-token')
-  async refreshToken(@Query('token') token: string) {
-    return this.authService.createToken(token);
   }
 
   // @Get()

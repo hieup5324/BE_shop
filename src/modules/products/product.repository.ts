@@ -14,14 +14,13 @@ export class ProductRepository extends Repository<ProductEntity> {
   async getProducts(query: ProductQuery): Promise<any> {
     let { search, page, page_size } = query;
 
-    // Gán giá trị mặc định nếu không có trong request
     page = page && !isNaN(Number(page)) ? Number(page) : 1;
     page_size = page_size && !isNaN(Number(page_size)) ? Number(page_size) : 10;
 
     const queryBuilder = this.createQueryBuilder('products');
 
     if (search) {
-      queryBuilder.andWhere('products.productName LIKE :search', {
+      queryBuilder.andWhere('products.product_name LIKE :search', {
         search: `%${search}%`,
       });
     }

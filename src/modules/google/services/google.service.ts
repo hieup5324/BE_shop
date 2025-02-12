@@ -24,12 +24,12 @@ export class GoogleService {
     const user = req.user;
     const hashedPw = await bcrypt.hash(user.email, 10);
     const newUser: Auth0UserDto = {
-      auth0userId: user.googleId,
+      auth0user_id: user.googleId,
       email: user.email,
       password: hashedPw,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      photoUrl: user.picture,
+      first_name: user.firstName,
+      last_name: user.lastName,
+      photo_url: user.picture,
       phone: user.phoneNumber || null,
       auth0user_token: user.accessToken,
     };

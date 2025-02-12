@@ -5,21 +5,19 @@ export class Auth0UserDto {
   password: string;
 
   @IsNotEmpty()
-  auth0userId: string;
+  auth0user_id: string;
 
-  firstName: string;
+  first_name: string;
 
-  lastName: string;
+  last_name: string;
 
   phone?: string;
 
-  photoUrl?: string;
-
-  address?: string;
+  photo_url?: string;
 
   email: string;
 
-  dateOfBirth?: Date;
+  date_of_birth?: Date;
 
   auth0user_token?: string;
 }

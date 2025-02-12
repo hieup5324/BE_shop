@@ -8,9 +8,6 @@ export class ProductEntity extends BaseEntityIdNumber {
   @Column({ type: 'varchar' })
   product_name: string;
 
-  @Column({ type: 'varchar' })
-  type: string;
-
   @Column({ type: 'int' })
   price: number;
 
@@ -24,7 +21,7 @@ export class ProductEntity extends BaseEntityIdNumber {
   description: string;
 
   @Column({ type: 'varchar', nullable: true })
-  photoUrl: string;
+  photo_url: string;
 
   @Column({ type: 'int' })
   quantity: number;
@@ -32,6 +29,7 @@ export class ProductEntity extends BaseEntityIdNumber {
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.products, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: UserEntity;
 
   @ManyToOne(() => CategoryEntity, (category) => category.products)

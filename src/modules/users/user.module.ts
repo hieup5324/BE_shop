@@ -3,7 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './userEntity/user.entity';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UserRepository } from './user.repository';
 import { CategoryEntity } from '../categories/entity/categories.entity';
@@ -17,7 +17,7 @@ import { CategoryEntity } from '../categories/entity/categories.entity';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, AuthService, UserRepository],
-  exports: [UserService, AuthService, UserRepository],
+  providers: [UserService, UserRepository],
+  exports: [UserService, UserRepository],
 })
 export class UserModule {}

@@ -12,9 +12,7 @@ export class RoleGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    console.log('RoleGuard');
     const request = context.switchToHttp().getRequest();
-    console.log('RoleGuard', request.currentUser);
 
     if (!this.role.includes(request.currentUser.role)) {
       throw new BadRequestException('Không có quyền thực hiện');

@@ -4,21 +4,26 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterUserDto } from './userDTO/registerUser.dto';
-import { UserService } from './user.service';
+import { RegisterUserDto } from '../users/userDTO/registerUser.dto';
+import { UserService } from '../users/user.service';
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
-import { LoginUserDto } from './userDTO/loginUser.dto';
+import { LoginUserDto } from '../users/userDTO/loginUser.dto';
+import { In } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CartEntity } from '../cart/entity/cart.entity';
+import { CartRepository } from '../cart/cart.repository';
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     private userService: UserService,
+    private cartRepo: CartRepository,
   ) {}
   async register(requestBody: RegisterUserDto) {
     let { email, password } = requestBody;
-    const user = await this.userService.findByEmail(email);
-    if (user) {
+    const userDB = await this.userService.findByEmail(email);
+    if (userDB) {
       throw new BadRequestException('Email đã tồn tại');
     }
     if (requestBody.role) {
@@ -28,10 +33,14 @@ export class AuthService {
 
     requestBody.password = hashedPw;
     // this.sendMail(requestBody.email);
-    const User = await this.userService.create(requestBody);
+
+    const user = await this.userService.create(requestBody);
+    const cart = this.cartRepo.create({ user });
+    await this.cartRepo.save(cart);
+
     const payload = {
-      id: User.id,
-      email: User.email,
+      id: user.id,
+      email: user.email,
     };
     const access_token = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
@@ -44,7 +53,7 @@ export class AuthService {
       msg: 'tạo tài khoản thành công',
       access_token,
       refresh_token,
-      User,
+      user,
     };
   }
 
@@ -57,6 +66,14 @@ export class AuthService {
     const checkpw = await bcrypt.compare(password, user.password);
     if (!checkpw) {
       throw new BadRequestException('sai mật khẩu');
+    }
+
+    let cart = await this.cartRepo.findOne({
+      where: { user: { id: user.id } },
+    });
+    if (!cart) {
+      cart = this.cartRepo.create({ user });
+      await this.cartRepo.save(cart);
     }
 
     const payload = {

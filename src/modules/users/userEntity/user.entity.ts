@@ -6,6 +6,7 @@ import { BaseEntityIdNumber } from 'src/common/base/entities/base.entity';
 import { CategoryEntity } from 'src/modules/categories/entity/categories.entity';
 import { OrderEntity } from 'src/modules/orders/entity/order.entity';
 import { CartEntity } from 'src/modules/cart/entity/cart.entity';
+import { USER_TYPE } from 'src/modules/shared/constants/common';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntityIdNumber {
@@ -24,8 +25,8 @@ export class UserEntity extends BaseEntityIdNumber {
   @Column({ type: 'varchar', nullable: true })
   phone?: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  type?: string;
+  @Column({ type: 'varchar', default: USER_TYPE.GENERAL })
+  type: string;
 
   @Column({ type: 'varchar', nullable: true })
   photo_url?: string;
