@@ -27,6 +27,6 @@ export class ShippingEntity extends BaseEntityIdNumber {
   @Column()
   country: string;
 
-  @OneToOne(() => OrderEntity, (order) => order.shippingAddress)
-  order: OrderEntity;
+  // @OneToOne(() => OrderEntity, (order) => order.shippingAddress)
+  // order: OrderEntity;
 }

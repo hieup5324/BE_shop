@@ -36,8 +36,8 @@ export class ProductService {
       +requestBody.categoryId,
     );
     const product = this.productRepo.create(requestBody);
-    product.categories = category;
-    product.users = currentUser;
+    product.category = category;
+    product.user = currentUser;
     return this.productRepo.save(product);
   }
 
@@ -132,15 +132,15 @@ export class ProductService {
     const product = await this.productRepo.findOne({
       where: { id: id },
       relations: {
-        users: true,
-        categories: true,
+        user: true,
+        category: true,
       },
       select: {
-        users: {
+        user: {
           id: true,
           email: true,
         },
-        categories: {
+        category: {
           id: true,
           name: true,
         },
@@ -159,8 +159,8 @@ export class ProductService {
     const product = await this.productRepo.findOne({
       where: { id: id },
       relations: {
-        categories: true,
-        users: true,
+        category: true,
+        user: true,
       },
     });
     if (!product) {
@@ -182,9 +182,9 @@ export class ProductService {
       const category = await this.categoryService.findOne(
         +requestBody.categoryId,
       );
-      product.categories = category;
+      product.category = category;
     }
-    product.users = currentUser;
+    product.user = currentUser;
 
     product = { ...product, ...requestBody };
 
@@ -203,10 +203,10 @@ export class ProductService {
   //   return product;
   // }
 
-  async deleteProduct(id: number) {
-    const product = await this.findOne(id);
-    const order = await this.orderService.findOneByProductId(product.id);
-    if (order) throw new BadRequestException('Sản phẩm đang được sử dụng.');
-    return await this.productRepo.remove(product);
-  }
+  // async deleteProduct(id: number) {
+  //   const product = await this.findOne(id);
+  //   const order = await this.orderService.findOneByProductId(product.id);
+  //   if (order) throw new BadRequestException('Sản phẩm đang được sử dụng.');
+  //   return await this.productRepo.remove(product);
+  // }
 }

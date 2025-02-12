@@ -9,5 +9,5 @@ export class CategoryQuery extends BaseQuery {
 
   @ApiPropertyOptional()
   @IsOptional()
-  product?: string;
+  category?: string;
 }

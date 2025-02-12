@@ -27,26 +27,26 @@ import { currentUser } from '../shared/decorators/currentUser.decorator';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Post('/create')
-  @UseGuards(AuthGuard)
-  async createProduct(
-    @Body() requestBody: CreateOrderDto,
-    @currentUser() currentUser: UserEntity,
-  ): Promise<OrderEntity> {
-    return await this.orderService.create(requestBody, currentUser);
-  }
+  // @Post('/create')
+  // @UseGuards(AuthGuard)
+  // async createProduct(
+  //   @Body() requestBody: CreateOrderDto,
+  //   @currentUser() currentUser: UserEntity,
+  // ): Promise<OrderEntity> {
+  //   return await this.orderService.create(requestBody, currentUser);
+  // }
 
-  @Get()
-  getAllOrder(): Promise<OrderEntity[]> {
-    return this.orderService.getAll();
-  }
+  // @Get()
+  // getAllOrder(): Promise<OrderEntity[]> {
+  //   return this.orderService.getAll();
+  // }
 
-  @Get('/:id')
-  async getOrderId(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<OrderEntity> {
-    return await this.orderService.findOne(id);
-  }
+  // @Get('/:id')
+  // async getOrderId(
+  //   @Param('id', ParseIntPipe) id: number,
+  // ): Promise<OrderEntity> {
+  //   return await this.orderService.findOne(id);
+  // }
 
   // @Put('/update/:id')
   // @UseGuards(new RoleGuard(['ADMIN']))
@@ -69,10 +69,10 @@ export class OrderController {
   //   return await this.orderService.cancelled(+id, currentUser);
   // }
 
-  @Delete('/delete/:id')
-  @UseGuards(new RoleGuard(['ADMIN']))
-  @UseGuards(AuthGuard)
-  deleteProduct(@Param('id', ParseIntPipe) id: number) {
-    return this.orderService.deleteOrder(id);
-  }
+  // @Delete('/delete/:id')
+  // @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(AuthGuard)
+  // deleteProduct(@Param('id', ParseIntPipe) id: number) {
+  //   return this.orderService.deleteOrder(id);
+  // }
 }

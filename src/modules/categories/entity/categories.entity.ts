@@ -12,8 +12,8 @@ export class CategoryEntity extends BaseEntityIdNumber {
   description: string;
 
   @ManyToOne(() => UserEntity, (user) => user.categories)
-  users: UserEntity;
+  user: UserEntity;
 
-  @OneToMany(() => ProductEntity, (product) => product.categories)
+  @OneToMany(() => ProductEntity, (product) => product.category)
   products: ProductEntity[];
 }

@@ -24,7 +24,7 @@ export class CategoryService {
 
   async create(requestBody: createCategoryDto, currentUser: UserEntity) {
     const category = await this.categoryRepo.create(requestBody);
-    category.users = currentUser;
+    category.user = currentUser;
     return this.categoryRepo.save(category);
   }
 
@@ -33,22 +33,22 @@ export class CategoryService {
   }
 
   async getCategoryWithProduct(query: CategoryQuery) {
-    const { search, page, page_size, product } = query;
+    console.log(query);
+    const { search, page, page_size, category } = query;
     const pageNumber = Number(page) || 1;
     const pageSize = Number(page_size) || 10;
     const skip = (pageNumber - 1) * pageSize;
 
-    const category = await this.categoryRepo.findOne({
-      where: { id: search },
+    const categoryDB = await this.categoryRepo.findOne({
+      where: { id: category },
     });
-
-    if (!category) {
+    if (!categoryDB) {
       throw new Error('Category not found');
     }
 
     const { products, total } = await this.productService.getProductsByCategory(
+      category,
       search,
-      product,
       skip,
       pageSize,
     );
@@ -74,7 +74,7 @@ export class CategoryService {
   async findById(id: number) {
     const category = await this.categoryRepo.findOne({
       where: { id: id },
-      relations: { users: true },
+      relations: { user: true },
     });
     if (!category) {
       throw new NotFoundException('danh mục không tồn tại');

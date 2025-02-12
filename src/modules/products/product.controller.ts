@@ -68,10 +68,10 @@ export class ProductController {
     return this.productService.updateById(id, requestBody, currentUser);
   }
 
-  @Delete('/delete/:id')
-  @UseGuards(new RoleGuard(['ADMIN']))
-  @UseGuards(AuthGuard)
-  async deleteProduct(@Param('id', ParseIntPipe) id: number) {
-    return await this.productService.deleteProduct(id);
-  }
+  // @Delete('/delete/:id')
+  // @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(AuthGuard)
+  // async deleteProduct(@Param('id', ParseIntPipe) id: number) {
+  //   return await this.productService.deleteProduct(id);
+  // }
 }

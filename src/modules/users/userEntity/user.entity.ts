@@ -1,89 +1,40 @@
 import { Exclude } from 'class-transformer';
 import { ProductEntity } from 'src/modules/products/entity/product.entity';
-import { Entity, Column, OneToMany } from 'typeorm';
+import { Entity, Column, OneToMany, OneToOne } from 'typeorm';
 import { ROLE } from '../common/users-role.enum';
 import { BaseEntityIdNumber } from 'src/common/base/entities/base.entity';
 import { CategoryEntity } from 'src/modules/categories/entity/categories.entity';
 import { OrderEntity } from 'src/modules/orders/entity/order.entity';
+import { CartEntity } from 'src/modules/cart/entity/cart.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntityIdNumber {
-  @Column({
-    type: 'varchar',
-    length: 128,
-    name: 'password',
-  })
+  @Column({ type: 'varchar', nullable: false })
   password: string;
 
-  @Column({
-    type: 'varchar',
-    length: 128,
-    name: 'auth0user_id',
-    nullable: true,
-  })
-  auth0userId?: string;
+  @Column({ type: 'varchar', nullable: true })
+  auth0user_id?: string;
 
-  @Column({
-    type: 'varchar',
-    length: 100,
-    name: 'first_name',
-  })
-  firstName: string;
+  @Column({ type: 'varchar', nullable: true })
+  first_name: string;
 
-  @Column({
-    type: 'varchar',
-    length: 255,
-    charset: 'utf8mb4',
-    collation: 'utf8mb4_unicode_ci',
-    name: 'last_name',
-  })
-  lastName: string;
+  @Column({ type: 'varchar', nullable: true })
+  last_name: string;
 
-  @Column({
-    type: 'varchar',
-    length: 100,
-    name: 'phone',
-    nullable: true,
-  })
+  @Column({ type: 'varchar', nullable: true })
   phone?: string;
 
-  @Column({
-    type: 'varchar',
-    length: 100,
-    name: 'type',
-    nullable: true,
-  })
+  @Column({ type: 'varchar', nullable: true })
   type?: string;
 
-  @Column({
-    type: 'varchar',
-    length: 100,
-    name: 'address',
-    nullable: true,
-  })
-  address?: string;
+  @Column({ type: 'varchar', nullable: true })
+  photo_url?: string;
 
-  @Column({
-    type: 'varchar',
-    length: 100,
-    name: 'photo_url',
-    nullable: true,
-  })
-  photoUrl?: string;
-
-  @Column({
-    type: 'varchar',
-    length: 100,
-    name: 'email',
-  })
+  @Column({ type: 'varchar' })
   email: string;
 
-  @Column({
-    type: 'date',
-    name: 'date_of_birth',
-    nullable: true,
-  })
-  dateOfBirth?: Date;
+  @Column({ type: 'date', nullable: true })
+  date_of_birth?: Date;
 
   @Column({ type: 'varchar', nullable: true })
   auth0user_token?: string;
@@ -91,19 +42,19 @@ export class UserEntity extends BaseEntityIdNumber {
   @Column({ type: 'enum', enum: ROLE, default: ROLE.USER })
   role: ROLE;
 
-  @OneToMany(() => ProductEntity, (productEntity) => productEntity.users, {
+  @OneToMany(() => ProductEntity, (productEntity) => productEntity.user, {
     cascade: true,
   })
   products: ProductEntity[];
 
-  @OneToMany(() => CategoryEntity, (categoryEntity) => categoryEntity.users, {
+  @OneToMany(() => CategoryEntity, (categoryEntity) => categoryEntity.user, {
     cascade: true,
   })
   categories: CategoryEntity[];
 
-  @OneToMany(() => OrderEntity, (order) => order.updatedBy)
-  ordersUpdateBy: OrderEntity[];
-
   @OneToMany(() => OrderEntity, (order) => order.user)
   orders: OrderEntity[];
+
+  @OneToOne(() => CartEntity, (cart) => cart.user, { cascade: true })
+  cart: CartEntity;
 }

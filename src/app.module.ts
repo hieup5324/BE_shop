@@ -13,10 +13,15 @@ import { OrderEntity } from './modules/orders/entity/order.entity';
 import { ProductEntity } from './modules/products/entity/product.entity';
 import { UserEntity } from './modules/users/userEntity/user.entity';
 import { CategoryEntity } from './modules/categories/entity/categories.entity';
-import { OrdersProductsEntity } from './modules/orders/entity/order-product.entity';
-import { ShippingEntity } from './modules/orders/entity/shipping.entity';
 import { ChatSocketModule } from './modules/chat-socket/chat-socket.module';
 import { GoogleModule } from './modules/google/google.module';
+import { OrderDetailEntity } from './modules/orders/entity/order-detail.entity';
+import { VnPayTransactionEntity } from './modules/payment/entity/vn_pay_transaction.entity';
+import { DiscountEntity } from './modules/discount/discount.entity';
+import { InvoiceEntity } from './modules/invoice/invoice.entity';
+import { ReviewEntity } from './modules/reviews/review.entity';
+import { CartEntity } from './modules/cart/entity/cart.entity';
+import { CartItemEntity } from './modules/cart/entity/cart-item.entity';
 
 @Module({
   imports: [
@@ -35,8 +40,13 @@ import { GoogleModule } from './modules/google/google.module';
           ProductEntity,
           CategoryEntity,
           OrderEntity,
-          OrdersProductsEntity,
-          ShippingEntity,
+          CartEntity,
+          CartItemEntity,
+          OrderDetailEntity,
+          VnPayTransactionEntity,
+          DiscountEntity,
+          InvoiceEntity,
+          ReviewEntity,
         ],
         synchronize: true,
         autoLoadEntities: true,

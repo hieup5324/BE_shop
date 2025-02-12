@@ -6,20 +6,20 @@ import { ShippingEntity } from './shipping.entity';
 import { ProductEntity } from 'src/modules/products/entity/product.entity';
 import { OrderEntity } from './order.entity';
 
-@Entity('order_product')
-export class OrdersProductsEntity extends BaseEntityIdNumber {
-  @Column({
-    type: 'float',
-    default: 0,
-  })
-  product_unit_price: number;
+// @Entity('order_product')
+// export class OrdersProductsEntity extends BaseEntityIdNumber {
+//   @Column({
+//     type: 'float',
+//     default: 0,
+//   })
+//   product_unit_price: number;
 
-  @Column()
-  product_quantity: number;
+//   @Column()
+//   product_quantity: number;
 
-  @ManyToOne(() => OrderEntity, (order) => order.products)
-  order: OrderEntity;
+//   @ManyToOne(() => OrderEntity, (order) => order.products)
+//   order: OrderEntity;
 
-  @ManyToOne(() => ProductEntity, (prod) => prod.products, { cascade: true })
-  product: ProductEntity;
-}
+//   @ManyToOne(() => ProductEntity, (prod) => prod.products, { cascade: true })
+//   product: ProductEntity;
+// }

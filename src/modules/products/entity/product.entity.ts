@@ -2,79 +2,39 @@ import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { UserEntity } from '../../users/userEntity/user.entity';
 import { BaseEntityIdNumber } from 'src/common/base/entities/base.entity';
 import { CategoryEntity } from 'src/modules/categories/entity/categories.entity';
-import { OrdersProductsEntity } from 'src/modules/orders/entity/order-product.entity';
 
 @Entity('product')
 export class ProductEntity extends BaseEntityIdNumber {
-  @Column({
-    name: 'product_name',
-    type: 'varchar',
-    length: 100,
-  })
-  productName: string;
+  @Column({ type: 'varchar' })
+  product_name: string;
 
-  @Column({
-    name: 'type',
-    type: 'varchar',
-    length: 100,
-  })
+  @Column({ type: 'varchar' })
   type: string;
 
-  @Column({
-    name: 'price',
-    type: 'int',
-  })
+  @Column({ type: 'int' })
   price: number;
 
-  @Column({
-    name: 'final_price',
-    type: 'int',
-    nullable: true,
-  })
-  finalPrice: number;
+  @Column({ type: 'int', nullable: true })
+  final_price: number;
 
-  @Column({
-    name: 'has_discount',
-    type: 'boolean',
-    default: false,
-  })
-  hasDiscount: boolean;
+  @Column({ type: 'boolean', default: false })
+  has_discount: boolean;
 
-  @Column({
-    name: 'description',
-    type: 'varchar',
-    nullable: true,
-    length: 100,
-  })
+  @Column({ type: 'varchar', nullable: true })
   description: string;
 
-  @Column({
-    name: 'photoUrl',
-    type: 'varchar',
-    nullable: true,
-    length: 1000,
-  })
+  @Column({ type: 'varchar', nullable: true })
   photoUrl: string;
 
-  @Column({
-    name: 'quantity',
-    type: 'int',
-  })
+  @Column({ type: 'int' })
   quantity: number;
 
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.products, {
     onDelete: 'CASCADE',
   })
-  // @Transform(({ obj }) => obj.user.id)
-  users: UserEntity;
+  user: UserEntity;
 
-  @ManyToOne(() => CategoryEntity)
-  @JoinColumn({
-    name: 'category_id',
-    referencedColumnName: 'id',
-  })
-  categories: CategoryEntity;
-
-  @OneToMany(() => OrdersProductsEntity, (op) => op.product)
-  products: OrdersProductsEntity[];
+  @ManyToOne(() => CategoryEntity, (category) => category.products)
+  @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
+  category: CategoryEntity;
 }
