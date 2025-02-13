@@ -24,8 +24,8 @@ export class ProductService {
   constructor(
     private readonly productRepo: ProductRepository,
     private readonly categoryService: CategoryService,
-    @Inject(forwardRef(() => OrderService))
-    private readonly orderService: OrderService,
+    // @Inject(forwardRef(() => OrderService))
+    // private readonly orderService: OrderService,
   ) {}
 
   async create(
@@ -120,7 +120,7 @@ export class ProductService {
     }
 
     if (productName) {
-      queryBuilder.andWhere('product.productName LIKE :productName', {
+      queryBuilder.andWhere('product.product_name LIKE :productName', {
         productName: `%${productName}%`,
       });
     }
@@ -162,7 +162,7 @@ export class ProductService {
 
   async findById(id: number) {
     const product = await this.productRepo.findOne({
-      where: { id: id },
+      where: { id },
       relations: {
         category: true,
         user: true,

@@ -14,7 +14,6 @@ import { ProductRepository } from './product.repository';
   imports: [
     TypeOrmModule.forFeature([ProductEntity, UserEntity]),
     CategoryModule,
-    forwardRef(() => OrderModule),
   ],
   providers: [ProductService, UserService, UserRepository, ProductRepository],
   controllers: [ProductController],

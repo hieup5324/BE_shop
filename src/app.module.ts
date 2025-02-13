@@ -58,7 +58,7 @@ import { AuthModule } from './modules/auth/auth.module';
     UserModule,
     ProductModule,
     CategoryModule,
-    OrderModule,
+    // OrderModule,
     ChatSocketModule,
     GoogleModule,
     CartModule,
