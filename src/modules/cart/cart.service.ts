@@ -11,6 +11,19 @@ export class CartService {
     private readonly cartItemRepo: CartItemRepository,
     private readonly productService: ProductService,
   ) {}
+
+  async findCartByUserId(userId: number) {
+    return await this.cartRepo.findOne({
+      where: { user: { id: userId } },
+      relations: ['cartItems', 'cartItems.product'],
+    });
+  }
+
+  async deleteCartItem(userId: number): Promise<void> {
+    const cart = await this.findCartByUserId(userId);
+    await this.cartItemRepo.softDelete({ cart: { id: cart.id } });
+  }
+
   async getCart(userId: number) {
     const cart = await this.cartRepo.findOne({
       where: { user: { id: userId } },
@@ -62,6 +75,30 @@ export class CartService {
 
     await this.cartItemRepo.save(cartItem);
     return { message: 'Đã thêm sản phẩm vào giỏ hàng', cartItem };
+  }
+
+  async updateCartItem(userId: number, productId: number, quantity: number) {
+    const cart = await this.cartRepo.findOne({
+      where: { user: { id: userId } },
+    });
+    if (!cart) throw new NotFoundException('Giỏ hàng không tồn tại');
+
+    const cartItem = await this.cartItemRepo.findOne({
+      where: { cart: { id: cart.id }, product: { id: productId } },
+    });
+
+    if (!cartItem)
+      throw new NotFoundException('Sản phẩm không có trong giỏ hàng');
+
+    if (quantity <= 0) {
+      await this.cartItemRepo.delete(cartItem.id);
+      return { message: 'Đã xóa sản phẩm khỏi giỏ hàng' };
+    }
+
+    cartItem.quantity = quantity;
+    await this.cartItemRepo.save(cartItem);
+
+    return { message: 'Đã cập nhật số lượng sản phẩm', cartItem };
   }
 
   async removeFromCart(userId: number, productId: number) {

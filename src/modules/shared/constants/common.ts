@@ -31,3 +31,23 @@ export enum USER_ROLE {
   DELETE_ROLE = 'delete:role',
   ALL_ROLE = 'all:role',
 }
+
+export enum PAYMENT_TYPE {
+  VNPAY = 'vnpay',
+  PAYPAL = 'paypal',
+  CASH = 'cash',
+  MOMO = 'momo',
+}
+
+export enum ORDER_STATUS {
+  PENDING = 'pending',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered',
+  CANCELLED = 'cancelled',
+}
+
+export enum PAYMENT_STATUS {
+  PENDING = 'pending',
+  SUCCESS = 'success',
+  CANCELLED = 'cancelled',
+}

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Request,
   UseGuards,
@@ -28,6 +29,13 @@ export class CartController {
   async addToCart(@Request() req, @Body() dto: AddToCartDto) {
     const userId = req.user.id;
     return this.cartService.addToCart(userId, dto);
+  }
+
+  @Patch()
+  @UseGuards(AuthGuard)
+  async updateCartItem(@Request() req, @Body() dto: any) {
+    const userId = req.user.id;
+    return this.cartService.updateCartItem(userId, dto.productId, dto.quantity);
   }
 
   @Delete('/:productId')

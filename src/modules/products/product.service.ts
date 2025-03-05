@@ -13,7 +13,6 @@ import { createProductDto } from './productDTO/createProduct.dto';
 import { updateProductDto } from './productDTO/updateProduct.dto';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { CategoryService } from '../categories/categoies.service';
-import { OrderStatus } from '../orders/enum/order-status.enum';
 import dataSource from 'db/data-source';
 import { OrderService } from '../orders/order.service';
 import { ProductRepository } from './product.repository';

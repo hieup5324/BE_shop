@@ -6,37 +6,53 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
-  PrimaryColumn,
 } from 'typeorm';
-import { OrderStatus } from '../enum/order-status.enum';
 import { UserEntity } from 'src/modules/users/userEntity/user.entity';
-import { ShippingEntity } from './shipping.entity';
-// import { OrdersProductsEntity } from './order-product.entity';
-import { OrderDetailEntity } from './order-detail.entity';
-import { ProductEntity } from 'src/modules/products/entity/product.entity';
 import { VnPayTransactionEntity } from 'src/modules/payment/entity/vn_pay_transaction.entity';
+import {
+  ORDER_STATUS,
+  PAYMENT_STATUS,
+  PAYMENT_TYPE,
+} from 'src/modules/shared/constants/common';
+import { OrderItemEntity } from './order-item.entity';
 
 @Entity('order')
 export class OrderEntity extends BaseEntityIdNumber {
-  @Column({ name: 'amount', type: 'int' })
-  amount: number;
+  @Column({ type: 'varchar', unique: true, length: 20 })
+  order_code: string;
 
-  @Column({ name: 'price', type: 'int' })
-  price: number;
+  @Column({ type: 'int', nullable: false })
+  total_price: number;
 
-  @OneToOne(() => OrderDetailEntity, (orderDetail) => orderDetail.order, {
-    cascade: true,
+  @Column({
+    type: 'enum',
+    enum: ORDER_STATUS,
+    default: ORDER_STATUS.PENDING,
   })
-  @JoinColumn({ name: 'order_detail_id', referencedColumnName: 'id' })
-  orderDetail: OrderDetailEntity;
+  status: ORDER_STATUS;
 
-  @ManyToOne(() => ProductEntity)
-  @JoinColumn({ name: 'product_id', referencedColumnName: 'id' })
-  product: ProductEntity;
+  @Column({ type: 'enum', enum: PAYMENT_TYPE, nullable: true })
+  payment_type: PAYMENT_TYPE;
 
-  @ManyToOne(() => UserEntity, (user) => user.orders)
+  @Column({
+    type: 'enum',
+    enum: PAYMENT_STATUS,
+    default: PAYMENT_STATUS.PENDING,
+  })
+  status_payment: PAYMENT_STATUS;
+
+  @ManyToOne(() => UserEntity, (user) => user.orders, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: UserEntity;
 
-  @OneToOne(() => VnPayTransactionEntity, (transaction) => transaction.order)
+  @OneToOne(() => VnPayTransactionEntity, (transaction) => transaction.order, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'transaction_id', referencedColumnName: 'id' })
   vnPayTransaction: VnPayTransactionEntity;
+
+  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.order, {
+    cascade: true,
+  })
+  orderItems: OrderItemEntity[];
 }

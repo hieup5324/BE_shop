@@ -10,6 +10,7 @@ import {
   Put,
   UseGuards,
   UseInterceptors,
+  Request,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
@@ -26,6 +27,18 @@ import { currentUser } from '../shared/decorators/currentUser.decorator';
 @UseInterceptors(new LoggingInterceptor())
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
+
+  @Get()
+  @UseGuards(AuthGuard)
+  async getUserOrders(@Request() req) {
+    return this.orderService.getUserOrders(req.user.id);
+  }
+
+  @Post()
+  @UseGuards(AuthGuard)
+  async createOrder(@Request() req, @Body() dto: CreateOrderDto) {
+    return this.orderService.createOrder(req.user.id, dto);
+  }
 
   // @Post('/create')
   // @UseGuards(AuthGuard)

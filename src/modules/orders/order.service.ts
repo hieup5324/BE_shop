@@ -10,25 +10,97 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { OrderEntity } from './entity/order.entity';
 import { CreateOrderDto } from './orderDTO/createOrder.dto';
-import { ShippingEntity } from './entity/shipping.entity';
 import { ProductEntity } from '../products/entity/product.entity';
 import { ProductService } from '../products/product.service';
 // import { OrdersProductsEntity } from './entity/order-product.entity';
 import { UpdateOrderDto } from './orderDTO/updateOrder.dto';
-import { OrderStatus } from './enum/order-status.enum';
 import { UpdateOrderStatusDto } from './orderDTO/updateOrder-status.dto';
+import { OrderRepository } from './order.repository';
+import { CartService } from '../cart/cart.service';
+import { OrderItemRepository } from './orderItem.repository';
+import { ORDER_STATUS } from '../shared/constants/common';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectRepository(OrderEntity)
-    private readonly orderRepo: Repository<OrderEntity>,
-    // @InjectRepository(OrdersProductsEntity)
-    // private readonly orderProductRepo: Repository<OrdersProductsEntity>,
-    @Inject(forwardRef(() => ProductService))
-    private readonly productService: ProductService,
+    private readonly orderRepo: OrderRepository,
+    private readonly orderItemRepo: OrderItemRepository,
+    private readonly cartService: CartService,
   ) {}
 
+  async findOrderById(id: number) {
+    return await this.orderRepo.findOne({ where: { id } });
+  }
+
+  async getUserOrders(userId: number) {
+    const orders = await this.orderRepo.find({
+      where: { user: { id: userId } },
+      relations: ['orderItems', 'orderItems.product'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return orders.map((order) => ({
+      id: order.id,
+      order_code: order.order_code,
+      total_price: order.total_price,
+      status: order.status,
+      payment_type: order.payment_type,
+      createdAt: order.createdAt,
+      orderItems: order.orderItems.map((item) => ({
+        product_name: item.product.product_name,
+        quantity: item.quantity,
+        total_price: item.price,
+        price: item.product.price,
+        photo_url: item.product.photo_url,
+      })),
+    }));
+  }
+
+  async createOrder(userId: number, dto: CreateOrderDto) {
+    const cart = await this.cartService.findCartByUserId(userId);
+
+    if (!cart || cart.cartItems.length === 0) {
+      throw new NotFoundException('Giỏ hàng trống, không thể đặt hàng');
+    }
+
+    const totalAmount = cart.cartItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
+
+    const order = this.orderRepo.create({
+      user: { id: userId },
+      order_code: `ORD-${uuidv4().split('-')[0]}`,
+      status: ORDER_STATUS.PENDING,
+      total_price: totalAmount,
+      payment_type: dto.payment_type,
+    });
+    const savedOrder = await this.orderRepo.save(order);
+
+    const orderItems = cart.cartItems.map((item) =>
+      this.orderItemRepo.create({
+        order: savedOrder,
+        product: item.product,
+        quantity: item.quantity,
+        price: item.price,
+      }),
+    );
+
+    await this.orderItemRepo.save(orderItems);
+
+    await this.cartService.deleteCartItem(userId);
+
+    return savedOrder;
+  }
+
+  async updateOrderStatus(orderId: number, status: ORDER_STATUS) {
+    const order = await this.orderRepo.findOne({ where: { id: orderId } });
+    if (!order) throw new NotFoundException('Không tìm thấy đơn hàng');
+
+    order.status = status;
+    return this.orderRepo.save(order);
+  }
   // async create(
   //   requestBody: CreateOrderDto,
   //   currentUser: UserEntity,
