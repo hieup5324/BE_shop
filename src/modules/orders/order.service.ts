@@ -18,15 +18,21 @@ import { UpdateOrderStatusDto } from './orderDTO/updateOrder-status.dto';
 import { OrderRepository } from './order.repository';
 import { CartService } from '../cart/cart.service';
 import { OrderItemRepository } from './orderItem.repository';
-import { ORDER_STATUS } from '../shared/constants/common';
+import {
+  ORDER_STATUS,
+  PAYMENT_STATUS,
+  PAYMENT_TYPE,
+} from '../shared/constants/common';
 import { v4 as uuidv4 } from 'uuid';
-
+import { VnPayService } from '../payment/VnPayService.service';
+import * as dayjs from 'dayjs';
 @Injectable()
 export class OrderService {
   constructor(
     private readonly orderRepo: OrderRepository,
     private readonly orderItemRepo: OrderItemRepository,
     private readonly cartService: CartService,
+    private readonly vnpayService: VnPayService,
   ) {}
 
   async findOrderById(id: number) {
@@ -47,6 +53,7 @@ export class OrderService {
       status: order.status,
       payment_type: order.payment_type,
       createdAt: order.createdAt,
+      status_payment: order.status_payment,
       orderItems: order.orderItems.map((item) => ({
         product_name: item.product.product_name,
         quantity: item.quantity,
@@ -88,18 +95,69 @@ export class OrderService {
     );
 
     await this.orderItemRepo.save(orderItems);
-
     await this.cartService.deleteCartItem(userId);
 
-    return savedOrder;
+    switch (dto.payment_type) {
+      case PAYMENT_TYPE.VNPAY:
+        return await this.vnpayService.createVNPayLink(savedOrder);
+      case PAYMENT_TYPE.MOMO:
+      // return this.createMoMoLink(savedOrder);
+      case PAYMENT_TYPE.CASH:
+        return savedOrder;
+      default:
+        throw new BadRequestException('Phương thức thanh toán không hợp lệ');
+    }
   }
 
-  async updateOrderStatus(orderId: number, status: ORDER_STATUS) {
-    const order = await this.orderRepo.findOne({ where: { id: orderId } });
-    if (!order) throw new NotFoundException('Không tìm thấy đơn hàng');
+  async updateOrderStatus(query: any, res: any) {
+    try {
+      const {
+        vnp_TxnRef,
+        vnp_Amount,
+        vnp_BankCode,
+        vnp_BankTranNo,
+        vnp_CardType,
+        vnp_OrderInfo,
+        vnp_PayDate,
+        vnp_ResponseCode,
+        vnp_TransactionNo,
+        vnp_TransactionStatus,
+      } = query;
 
-    order.status = status;
-    return this.orderRepo.save(order);
+      const order = await this.orderRepo.findOne({
+        where: { order_code: vnp_TxnRef },
+      });
+      if (!order) throw new NotFoundException('Không tìm thấy đơn hàng');
+      const status =
+        vnp_ResponseCode === '00'
+          ? PAYMENT_STATUS.SUCCESS
+          : PAYMENT_STATUS.FAILED;
+      order.status_payment = status;
+      const transaction = await this.vnpayService.getTransactionByOrderId(
+        order.id,
+      );
+      transaction.amount = parseInt(vnp_Amount) / 100;
+      transaction.bank_code = vnp_BankCode;
+      transaction.bank_tran_no = vnp_BankTranNo;
+      transaction.card_type = vnp_CardType;
+      transaction.order_info = vnp_OrderInfo;
+      transaction.pay_date = new Date(
+        dayjs(vnp_PayDate, 'YYYYMMDDHHmmss').toISOString(),
+      );
+      transaction.response_code = vnp_ResponseCode;
+      transaction.transaction_no = vnp_TransactionNo;
+      transaction.transaction_status =
+        vnp_TransactionStatus === '00'
+          ? PAYMENT_STATUS.SUCCESS
+          : PAYMENT_STATUS.FAILED;
+      await this.vnpayService.updateTransaction(transaction);
+      await this.orderRepo.save(order);
+      return res.redirect(
+        `http://localhost:3000/payment?transactionId=${transaction.id}`,
+      );
+    } catch (error) {
+      console.log(error);
+    }
   }
   // async create(
   //   requestBody: CreateOrderDto,

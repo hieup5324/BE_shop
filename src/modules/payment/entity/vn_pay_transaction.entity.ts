@@ -34,9 +34,6 @@ export class VnPayTransactionEntity extends BaseEntityIdNumber {
   response_code: string;
 
   @Column({ type: 'varchar', nullable: true })
-  sercure_hash: string;
-
-  @Column({ type: 'varchar', nullable: true })
   transaction_no: string;
 
   @Column({ type: 'varchar', nullable: true })

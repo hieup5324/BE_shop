@@ -8,12 +8,14 @@ import { OrderRepository } from './order.repository';
 import { UserModule } from '../users/user.module';
 import { OrderItemRepository } from './orderItem.repository';
 import { CartModule } from '../cart/cart.module';
+import { VnPayModule } from '../payment/VnPayModule.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([OrderEntity, OrderItemEntity]),
     UserModule,
     CartModule,
+    forwardRef(() => VnPayModule),
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderRepository, OrderItemRepository],

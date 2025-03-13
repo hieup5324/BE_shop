@@ -33,7 +33,6 @@ export class CategoryService {
   }
 
   async getCategoryWithProduct(query: CategoryQuery) {
-    console.log(query);
     const { search, page, page_size, category } = query;
     const pageNumber = Number(page) || 1;
     const pageSize = Number(page_size) || 10;

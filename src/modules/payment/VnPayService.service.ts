@@ -4,12 +4,13 @@ import * as qs from 'qs';
 import { ConfigService } from '@nestjs/config';
 import { VNpayRepository } from './vnpay.repository';
 import * as dayjs from 'dayjs';
+import { PAYMENT_STATUS } from '../shared/constants/common';
 
 @Injectable()
 export class VnPayService {
   constructor(
     private readonly configService: ConfigService,
-    // private readonly vnPayTransactionRepository: VNpayRepository,
+    private readonly vnPayTransactionRepository: VNpayRepository,
   ) {}
 
   async createVNPayLink(order: any): Promise<any> {
@@ -21,14 +22,14 @@ export class VnPayService {
       const returnUrl = this.configService.get<string>('VNP_RETURN_URL');
 
       let createDate = dayjs().format('YYYYMMDDHHmmss');
-      let amount = order.total_price;
+      let amount = order.total_price * 100;
       let vnp_Params: Record<string, string> = {
         vnp_Version: '2.1.0',
         vnp_Command: 'pay',
         vnp_TmnCode: tmnCode,
         vnp_Locale: 'vn',
         vnp_CurrCode: 'VND',
-        vnp_TxnRef: order.id.toString(),
+        vnp_TxnRef: order.order_code.toString(),
         vnp_OrderInfo: `Thanhtoanhoadon${order.id}`,
         vnp_OrderType: 'other',
         vnp_Amount: amount.toString(),
@@ -36,7 +37,6 @@ export class VnPayService {
         vnp_IpAddr: ipAddr,
         vnp_CreateDate: createDate,
       };
-      console.log('vnp_Params', vnp_Params);
       vnp_Params = this.sortObject(vnp_Params);
 
       let signData = qs.stringify(vnp_Params, { encode: false });
@@ -45,6 +45,14 @@ export class VnPayService {
       let signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
       vnp_Params['vnp_SecureHash'] = signed;
       vnpUrl += '?' + qs.stringify(vnp_Params, { encode: false });
+      const transaction = this.vnPayTransactionRepository.create({
+        order: order,
+        amount: order.total_price,
+        order_info: vnp_Params.vnp_OrderInfo,
+        transaction_status: PAYMENT_STATUS.PENDING,
+      });
+
+      await this.vnPayTransactionRepository.save(transaction);
 
       return { vnpay_url: vnpUrl };
     } catch (error) {
@@ -84,5 +92,25 @@ export class VnPayService {
       .digest('hex');
 
     return signed === vnp_SecureHash;
+  }
+
+  async getTransactionByOrderId(orderId: string) {
+    return await this.vnPayTransactionRepository.findOne({
+      where: { order: { id: orderId } },
+      relations: ['order'], // Đảm bảo lấy cả thông tin đơn hàng
+    });
+  }
+
+  async updateTransaction(trans: any) {
+    return await this.vnPayTransactionRepository.save(trans);
+  }
+
+  async getTransactionById(id: string) {
+    return await this.vnPayTransactionRepository.findOne({
+      where: { id },
+      relations: {
+        order: true,
+      },
+    });
   }
 }

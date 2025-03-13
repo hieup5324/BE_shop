@@ -34,7 +34,7 @@ export enum USER_ROLE {
 
 export enum PAYMENT_TYPE {
   VNPAY = 'vnpay',
-  PAYPAL = 'paypal',
+  ZALOPAY = 'zalopay',
   CASH = 'cash',
   MOMO = 'momo',
 }
@@ -49,5 +49,11 @@ export enum ORDER_STATUS {
 export enum PAYMENT_STATUS {
   PENDING = 'pending',
   SUCCESS = 'success',
-  CANCELLED = 'cancelled',
+  FAILED = 'failed',
 }
+
+export const PAYMENT_CODE_STATUS = {
+  SUCCESS: '00',
+  PENDING: '01',
+  FAILED: '02',
+};
