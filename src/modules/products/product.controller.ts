@@ -38,7 +38,7 @@ export class ProductController {
   }
 
   @Post()
-  @UseGuards(AuthGuard, new RoleGuard(['ADMIN']))
+  // @UseGuards(AuthGuard, new RoleGuard(['ADMIN']))
   createProduct(
     @Body() requestBody: createProductDto,
     @currentUser() currentUser: UserEntity,
@@ -58,7 +58,7 @@ export class ProductController {
   }
 
   @Put('/update/:id')
-  @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(new RoleGuard(['ADMIN']))
   @UseGuards(AuthGuard)
   updateProduct(
     @Param('id', ParseIntPipe) id: number,

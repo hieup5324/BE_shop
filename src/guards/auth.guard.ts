@@ -28,7 +28,7 @@ export class AuthGuard implements CanActivate {
       const user = await this.userService.findByEmail(payload.email);
       if (!user) throw new BadRequestException('Người dùng không tồn tại');
 
-      request.user = user;
+      request.currentUser = user;
       return true;
     } catch (error) {
       throw new ForbiddenException('Token hết hạn hoặc không hợp lệ');

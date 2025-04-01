@@ -13,6 +13,8 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
 import { ROLE } from './common/users-role.enum';
 import { ChangePasswordDto } from './userDTO/change-password.dto';
+import { query } from 'express';
+import { UserQuery } from './userDTO/user.query';
 
 @Injectable()
 export class UserService {
@@ -26,9 +28,9 @@ export class UserService {
     return this.usersRepo.save(user);
   }
 
-  // findAllUser() {
-  //   return this.usersRepo.findAllUsers();
-  // }
+  async findAllUser(query: UserQuery) {
+    return await this.usersRepo.findUser(query);
+  }
 
   async changePassword(userId: number, userInput: ChangePasswordDto) {
     const user = await this.usersRepo.findOneBy({ id: userId });

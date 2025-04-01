@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './userEntity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ROLE } from './common/users-role.enum';
+import { UserQuery } from './userDTO/user.query';
 // import * as dayjs from 'dayjs';
 
 export class UserRepository extends Repository<UserEntity> {
@@ -31,7 +32,37 @@ export class UserRepository extends Repository<UserEntity> {
   //     createdAt: dayjs(user.createdAt).format('DD-MM-YYYY'),
   //     dob: dayjs(user.dob).format('DD-MM-YYYY'),
   //   }));
-  // }
+  //
+
+  async findUser(query: UserQuery): Promise<any> {
+    let { search, page, page_size } = query;
+
+    page = page && !isNaN(Number(page)) ? Number(page) : 1;
+    page_size = page_size && !isNaN(Number(page_size)) ? Number(page_size) : 10;
+
+    const queryBuilder = this.createQueryBuilder('users');
+
+    if (search) {
+      queryBuilder.andWhere('users.email LIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+
+    const skip = (page - 1) * page_size;
+    queryBuilder.skip(skip).take(page_size);
+
+    const [users, total] = await queryBuilder.getManyAndCount();
+
+    return {
+      data: users,
+      paging: {
+        total,
+        page,
+        page_size,
+        totalPages: Math.ceil(total / page_size),
+      },
+    };
+  }
   findAllAdmin(): Promise<UserEntity[]> {
     return this.userRepo
       .createQueryBuilder('user')

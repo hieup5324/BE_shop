@@ -16,7 +16,7 @@ export class RoomController {
   }
 
   @Get()
-  @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(new RoleGuard(['ADMIN']))
   async getRooms() {
     return await this.roomService.getRooms();
   }

@@ -4,11 +4,9 @@ export class updateCategoryDto {
   @IsNotEmpty()
   @IsString()
   @Length(1, 20)
-  title: string;
+  name: string;
 
-  @MaxLength(250, {
-    message: 'mo ta qua dai',
-  })
+  @MaxLength(250)
   @IsString()
-  description: string;
+  description?: string;
 }

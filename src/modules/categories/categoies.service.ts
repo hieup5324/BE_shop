@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -13,6 +14,7 @@ import { updateCategoryDto } from './categoriesDTO/update-category.dto';
 import { CategoryRepository } from './categories.repository';
 import { CategoryQuery } from './categoriesDTO/categories.query';
 import { ProductService } from '../products/product.service';
+import { query } from 'express';
 
 @Injectable()
 export class CategoryService {
@@ -23,13 +25,18 @@ export class CategoryService {
   ) {}
 
   async create(requestBody: createCategoryDto, currentUser: UserEntity) {
-    const category = await this.categoryRepo.create(requestBody);
+    const { name } = requestBody;
+    const cateExits = await this.findOneByOption({ name });
+    if (cateExits) {
+      throw new ForbiddenException('Danh mục đã tồn tại');
+    }
+    const category = this.categoryRepo.create(requestBody);
     category.user = currentUser;
     return this.categoryRepo.save(category);
   }
 
-  getAll() {
-    return this.categoryRepo.find();
+  async getAll(query: CategoryQuery) {
+    return await this.categoryRepo.getAllCategories(query);
   }
 
   async getCategoryWithProduct(query: CategoryQuery) {
@@ -81,34 +88,33 @@ export class CategoryService {
     return category;
   }
 
-  async updateById(
-    id: number,
-    requestBody: updateCategoryDto,
-    currentUser: UserEntity,
-  ) {
-    let product = await this.findOneByOption({
+  async updateById(id: number, requestBody: updateCategoryDto) {
+    let category = await this.findOneByOption({
       id: id,
-      user_id: currentUser.id,
     });
 
-    if (!product) {
+    if (!category) {
       throw new NotFoundException('không có danh muc nay');
     }
 
-    product = { ...product, ...requestBody };
+    category = { ...category, ...requestBody };
 
-    const updateProduct = this.categoryRepo.save(product);
-    return updateProduct;
+    this.categoryRepo.save(category);
+    return {
+      message: 'Cập nhật danh mục thành công',
+    };
   }
 
-  async deleteCategory(id: number, currentUser: UserEntity) {
+  async deleteCategory(id: number) {
     let category = await this.findOneByOption({
-      id: id,
-      user_id: currentUser.id,
+      id,
     });
     if (!category) {
-      throw new NotFoundException('không có danh muc này');
+      throw new NotFoundException('không có danh mục này');
     }
-    return this.categoryRepo.remove(category);
+    await this.categoryRepo.remove(category);
+    return {
+      message: 'Xóa danh mục thành công',
+    };
   }
 }

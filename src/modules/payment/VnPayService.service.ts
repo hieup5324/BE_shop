@@ -51,7 +51,6 @@ export class VnPayService {
         order_info: vnp_Params.vnp_OrderInfo,
         transaction_status: PAYMENT_STATUS.PENDING,
       });
-
       await this.vnPayTransactionRepository.save(transaction);
 
       return { vnpay_url: vnpUrl };
@@ -76,16 +75,14 @@ export class VnPayService {
   }
 
   verifyPayment(query: any) {
-    const secretKey = this.configService.get<string>('VNP_HASH_SECRET'); // ✅ Fix lỗi key env
+    const secretKey = this.configService.get<string>('VNP_HASH_SECRET');
     const { vnp_SecureHash, ...otherParams } = query;
 
-    // ✅ Sắp xếp lại params
     const sortedParams = Object.keys(otherParams)
       .sort()
       .map((key) => `${key}=${otherParams[key]}`)
       .join('&');
 
-    // ✅ Tạo lại SecureHash
     const signed = crypto
       .createHmac('sha512', secretKey)
       .update(Buffer.from(sortedParams, 'utf-8'))
@@ -97,7 +94,7 @@ export class VnPayService {
   async getTransactionByOrderId(orderId: string) {
     return await this.vnPayTransactionRepository.findOne({
       where: { order: { id: orderId } },
-      relations: ['order'], // Đảm bảo lấy cả thông tin đơn hàng
+      relations: ['order'],
     });
   }
 

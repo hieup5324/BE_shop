@@ -19,7 +19,7 @@ import { UserEntity } from '../users/userEntity/user.entity';
 import { createCategoryDto } from './categoriesDTO/create-category.dto';
 import { updateCategoryDto } from './categoriesDTO/update-category.dto';
 import { CategoryService } from './categoies.service';
-import { RoleGuard } from 'src/guards/role.guard';
+import { RoleGuard, Roles, TYPE_LOGIN } from 'src/guards/role.guard';
 import { CategoryQuery } from './categoriesDTO/categories.query';
 
 @Controller('categories')
@@ -29,8 +29,8 @@ export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
   @Get()
-  getAllCategory() {
-    return this.categoryService.getAll();
+  getAllCategory(@Query() query: CategoryQuery) {
+    return this.categoryService.getAll(query);
   }
 
   @Get('/product')
@@ -39,7 +39,8 @@ export class CategoryController {
   }
 
   @Post()
-  @UseGuards(AuthGuard, new RoleGuard(['ADMIN']))
+  @Roles(TYPE_LOGIN.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
   createCategory(
     @Body() requestBody: createCategoryDto,
     @currentUser() currentUser: UserEntity,
@@ -48,28 +49,24 @@ export class CategoryController {
   }
 
   @Get('/:id')
-  @UseGuards(new RoleGuard(['ADMIN']))
   getCategoryById(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.findById(id);
   }
 
-  @Put('/update/:id')
-  @UseGuards(AuthGuard)
-  @UseGuards(new RoleGuard(['ADMIN']))
+  @Put('/:id')
+  @Roles(TYPE_LOGIN.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
   updateCategory(
     @Param('id', ParseIntPipe) id: number,
     @Body() requestBody: updateCategoryDto,
-    @currentUser() currentUser: UserEntity,
   ) {
-    return this.categoryService.updateById(id, requestBody, currentUser);
+    return this.categoryService.updateById(id, requestBody);
   }
 
   @Delete('/delete/:id')
-  @UseGuards(new RoleGuard(['ADMIN']))
-  deleteCategory(
-    @Param('id', ParseIntPipe) id: number,
-    @currentUser() currentUser: UserEntity,
-  ) {
-    return this.categoryService.deleteCategory(id, currentUser);
+  @Roles(TYPE_LOGIN.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  deleteCategory(@Param('id', ParseIntPipe) id: number) {
+    return this.categoryService.deleteCategory(id);
   }
 }

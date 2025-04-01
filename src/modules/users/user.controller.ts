@@ -26,6 +26,7 @@ import { RoleGuard } from 'src/guards/role.guard';
 import { UpdateUserDto } from './userDTO/updateUser.dto';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
 import { ChangePasswordDto } from './userDTO/change-password.dto';
+import { UserQuery } from './userDTO/user.query';
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(LoggingInterceptor)
@@ -40,22 +41,22 @@ export class UserController {
     return this.userService.changePassword(id, userInput);
   }
 
-  // @Get()
+  @Get()
   // @UseGuards(new RoleGuard(['ADMIN']))
   // @UseGuards(AuthGuard)
-  // getAllUser() {
-  //   return this.userService.findAllUser();
-  // }
+  getAllUser(@Query() query: UserQuery) {
+    return this.userService.findAllUser(query);
+  }
 
   @Get('/admin')
-  @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(new RoleGuard(['ADMIN']))
   @UseGuards(AuthGuard)
   getAllAdmin() {
     return this.userService.findAllAdmin();
   }
 
   @Get('/role_count')
-  @UseGuards(new RoleGuard(['ADMIN']))
+  // @UseGuards(new RoleGuard(['ADMIN']))
   @UseGuards(AuthGuard)
   groupByRoleCount() {
     return this.userService.groupByRoleCount();
@@ -85,7 +86,7 @@ export class UserController {
   }
 
   @Patch('/update/:id')
-  @UseGuards(new RoleGuard(['ADMIN', 'USER']))
+  // @UseGuards(new RoleGuard(['ADMIN', 'USER']))
   @UseGuards(AuthGuard)
   updateUser(
     @Param('id', ParseIntPipe) id: number,
