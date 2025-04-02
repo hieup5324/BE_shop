@@ -26,6 +26,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { VnPayService } from '../payment/VnPayService.service';
 import * as dayjs from 'dayjs';
+import { OrderQuery } from './orderDTO/orders.query';
 @Injectable()
 export class OrderService {
   constructor(
@@ -62,6 +63,10 @@ export class OrderService {
         photo_url: item.product.photo_url,
       })),
     }));
+  }
+
+  async getUserOrdersV2(query: OrderQuery) {
+    return await this.orderRepo.getOrders(query);
   }
 
   async createOrder(userId: number, dto: CreateOrderDto) {
@@ -123,7 +128,7 @@ export class OrderService {
         vnp_TransactionNo,
         vnp_TransactionStatus,
       } = query;
-
+      console.log('query', query);
       const order = await this.orderRepo.findOne({
         where: { order_code: vnp_TxnRef },
       });

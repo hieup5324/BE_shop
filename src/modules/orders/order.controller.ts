@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
   Request,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
@@ -21,6 +22,7 @@ import { CreateOrderDto } from './orderDTO/createOrder.dto';
 import { OrderEntity } from './entity/order.entity';
 import { UpdateOrderStatusDto } from './orderDTO/updateOrder-status.dto';
 import { currentUser } from '../shared/decorators/currentUser.decorator';
+import { OrderQuery } from './orderDTO/orders.query';
 
 @Controller('order')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -31,7 +33,13 @@ export class OrderController {
   @Get()
   @UseGuards(AuthGuard)
   async getUserOrders(@Request() req) {
-    return this.orderService.getUserOrders(req.user.id);
+    return this.orderService.getUserOrders(req.currentUser.id);
+  }
+
+  @Get('test')
+  @UseGuards(AuthGuard)
+  async getUserOrdersV2(@Query() query: OrderQuery) {
+    return await this.orderService.getUserOrdersV2(query);
   }
 
   @Post()

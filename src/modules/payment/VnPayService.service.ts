@@ -110,4 +110,8 @@ export class VnPayService {
       },
     });
   }
+
+  async getTransaction(query: any) {
+    return await this.vnPayTransactionRepository.getTransaction(query);
+  }
 }

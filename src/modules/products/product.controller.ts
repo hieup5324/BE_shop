@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -9,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,18 +21,24 @@ import { updateProductDto } from './productDTO/updateProduct.dto';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
 import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { UserEntity } from '../users/userEntity/user.entity';
-import { RoleGuard } from 'src/guards/role.guard';
+import { RoleGuard, Roles, TYPE_LOGIN } from 'src/guards/role.guard';
 import { ProductEntity } from './entity/product.entity';
 import { query } from 'express';
 import { ProductsDto } from './productDTO/productDto';
 import { SerializeIncludes } from 'src/interceptor/serializa.interceptor';
 import { ProductQuery } from './productDTO/product.query';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage, memoryStorage } from 'multer';
+import { CloudinaryService } from '../config/cloudinary.service';
 
 @Controller('products')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(new LoggingInterceptor())
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly cloudinaryService: CloudinaryService, // Inject Cloudinary service
+  ) {}
 
   @Get()
   async getProducts(@Query() query: ProductQuery): Promise<any> {
@@ -38,11 +46,30 @@ export class ProductController {
   }
 
   @Post()
-  // @UseGuards(AuthGuard, new RoleGuard(['ADMIN']))
-  createProduct(
-    @Body() requestBody: createProductDto,
+  @Roles(TYPE_LOGIN.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @UseInterceptors(
+    FileInterceptor('photo_url', {
+      limits: {
+        fieldNameSize: 255,
+        fileSize: 50e6,
+      },
+    }),
+  )
+  async createProduct(
+    @Body() requestBody: any,
+    @UploadedFile() file: Express.Multer.File,
     @currentUser() currentUser: UserEntity,
   ): Promise<ProductEntity> {
+    if (file) {
+      try {
+        const imageUrl = await this.cloudinaryService.uploadImage(file);
+        requestBody.photo_url = imageUrl;
+      } catch (error) {
+        console.error('Error uploading image to Cloudinary:', error);
+        throw new BadRequestException('Failed to upload image to Cloudinary');
+      }
+    }
     return this.productService.create(requestBody, currentUser);
   }
 

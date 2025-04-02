@@ -12,6 +12,7 @@ import { query, Request } from 'express';
 import { OrderService } from 'src/modules/orders/order.service';
 import { VnPayService } from './VnPayService.service';
 import { ORDER_STATUS } from '../shared/constants/common';
+import { TransactionQuery } from './dto/transaction.query';
 
 @Controller('vnpay')
 export class VnPayController {
@@ -19,6 +20,11 @@ export class VnPayController {
     private readonly vnPayService: VnPayService,
     private readonly orderService: OrderService,
   ) {}
+
+  @Get()
+  async getTransaction(@Query() query: TransactionQuery) {
+    return await this.vnPayService.getTransaction(query);
+  }
 
   @Get('return')
   async handleReturn(@Query() query: any, @Res() res: any) {

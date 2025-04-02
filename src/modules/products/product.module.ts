@@ -9,13 +9,20 @@ import { UserRepository } from '../users/user.repository';
 import { UserService } from '../users/user.service';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { ProductRepository } from './product.repository';
+import { CloudinaryService } from '../config/cloudinary.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ProductEntity, UserEntity]),
     CategoryModule,
   ],
-  providers: [ProductService, UserService, UserRepository, ProductRepository],
+  providers: [
+    ProductService,
+    UserService,
+    UserRepository,
+    ProductRepository,
+    CloudinaryService,
+  ],
   controllers: [ProductController],
   exports: [ProductService],
 })
