@@ -13,12 +13,10 @@ export class OrderRepository extends Repository<OrderEntity> {
 
   async getOrders(query: OrderQuery): Promise<any> {
     let { search, page, page_size } = query;
-    console.log('query', query);
     page = page && !isNaN(Number(page)) ? Number(page) : 1;
     page_size = page_size && !isNaN(Number(page_size)) ? Number(page_size) : 10;
 
     const queryBuilder = this.createQueryBuilder('orders');
-    // console.log('queryBuilder', queryBuilder);
     // if (search) {
     //   queryBuilder.andWhere('categories.name LIKE :search', {
     //     search: `%${search}%`,
@@ -27,9 +25,9 @@ export class OrderRepository extends Repository<OrderEntity> {
 
     const skip = (page - 1) * page_size;
     queryBuilder.skip(skip).take(page_size);
+    queryBuilder.orderBy('orders.createdAt', 'DESC');
 
     const [orders, total] = await queryBuilder.getManyAndCount();
-    console.log('orders', orders);
     return {
       data: orders,
       paging: {

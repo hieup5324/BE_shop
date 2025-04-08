@@ -45,7 +45,7 @@ export class OrderController {
   @Post()
   @UseGuards(AuthGuard)
   async createOrder(@Request() req, @Body() dto: CreateOrderDto) {
-    return this.orderService.createOrder(req.user.id, dto);
+    return this.orderService.createOrder(req.currentUser.id, dto);
   }
 
   // @Post('/create')

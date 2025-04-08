@@ -41,6 +41,12 @@ export class OrderEntity extends BaseEntityIdNumber {
   })
   status_payment: PAYMENT_STATUS;
 
+  @Column({ type: 'varchar', nullable: true })
+  order_code_transport: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  fee_transport: string;
+
   @ManyToOne(() => UserEntity, (user) => user.orders, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: UserEntity;

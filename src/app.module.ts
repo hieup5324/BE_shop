@@ -25,6 +25,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { OrderItemEntity } from './modules/orders/entity/order-item.entity';
 import { OrderModule } from './modules/orders/order.module';
 import { VnPayModule } from './modules/payment/VnPayModule.module';
+import { GHNModule } from './modules/GHN/GHN.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { VnPayModule } from './modules/payment/VnPayModule.module';
     CartModule,
     AuthModule,
     VnPayModule,
+    GHNModule,
   ],
   controllers: [AppController],
   providers: [

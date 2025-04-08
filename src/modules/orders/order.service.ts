@@ -27,6 +27,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { VnPayService } from '../payment/VnPayService.service';
 import * as dayjs from 'dayjs';
 import { OrderQuery } from './orderDTO/orders.query';
+import { GHNService } from '../GHN/GHN.service';
 @Injectable()
 export class OrderService {
   constructor(
@@ -34,6 +35,7 @@ export class OrderService {
     private readonly orderItemRepo: OrderItemRepository,
     private readonly cartService: CartService,
     private readonly vnpayService: VnPayService,
+    private readonly ghnService: GHNService,
   ) {}
 
   async findOrderById(id: number) {
@@ -89,7 +91,6 @@ export class OrderService {
       payment_type: dto.payment_type,
     });
     const savedOrder = await this.orderRepo.save(order);
-
     const orderItems = cart.cartItems.map((item) =>
       this.orderItemRepo.create({
         order: savedOrder,
@@ -99,14 +100,49 @@ export class OrderService {
       }),
     );
 
+    const { order_code_transport, fee_transport } =
+      await this.ghnService.createOrderGHN({
+        payment_type_id: 1,
+        note: 'Đơn hàng từ website',
+        required_note: 'CHOXEMHANGKHONGTHU',
+        from_name: 'Tên shop',
+        from_phone: '0333387484',
+        from_address: 'Địa chỉ shop',
+        from_ward_code: '13010',
+        from_district_id: 3440,
+
+        to_name: dto.receiver_name,
+        to_phone: dto.receiver_phone,
+        to_address: dto.receiver_address,
+        to_ward_code: dto.ward_id,
+        to_district_id: dto.district_id,
+
+        weight: 20000,
+        length: 50,
+        width: 50,
+        height: 50,
+        service_type_id: 2,
+        items: cart.cartItems.map((item) => ({
+          name: item.product.product_name,
+          quantity: item.quantity,
+          price: item.price,
+          weight: 10000,
+        })),
+      });
+
+    await this.orderRepo.save({
+      ...order,
+      order_code_transport,
+      fee_transport,
+      total_price: savedOrder.total_price + fee_transport,
+    });
+
     await this.orderItemRepo.save(orderItems);
     await this.cartService.deleteCartItem(userId);
 
     switch (dto.payment_type) {
       case PAYMENT_TYPE.VNPAY:
         return await this.vnpayService.createVNPayLink(savedOrder);
-      case PAYMENT_TYPE.MOMO:
-      // return this.createMoMoLink(savedOrder);
       case PAYMENT_TYPE.CASH:
         return savedOrder;
       default:
@@ -128,7 +164,7 @@ export class OrderService {
         vnp_TransactionNo,
         vnp_TransactionStatus,
       } = query;
-      console.log('query', query);
+
       const order = await this.orderRepo.findOne({
         where: { order_code: vnp_TxnRef },
       });
