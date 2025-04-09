@@ -57,6 +57,7 @@ export class OrderService {
       payment_type: order.payment_type,
       createdAt: order.createdAt,
       status_payment: order.status_payment,
+      // receiver_address: order.receiver_address,
       orderItems: order.orderItems.map((item) => ({
         product_name: item.product.product_name,
         quantity: item.quantity,
@@ -67,8 +68,8 @@ export class OrderService {
     }));
   }
 
-  async getUserOrdersV2(query: OrderQuery) {
-    return await this.orderRepo.getOrders(query);
+  async getUserOrdersV2(userId: number, query: OrderQuery) {
+    return await this.orderRepo.getOrders(userId, query);
   }
 
   async createOrder(userId: number, dto: CreateOrderDto) {
@@ -103,11 +104,11 @@ export class OrderService {
     const { order_code_transport, fee_transport } =
       await this.ghnService.createOrderGHN({
         payment_type_id: 1,
-        note: 'Đơn hàng từ website',
+        note: 'Đơn hàng từ Shop LapTop',
         required_note: 'CHOXEMHANGKHONGTHU',
-        from_name: 'Tên shop',
+        from_name: 'Shop LapTop',
         from_phone: '0333387484',
-        from_address: 'Địa chỉ shop',
+        from_address: 'Đại học Xây Dựng',
         from_ward_code: '13010',
         from_district_id: 3440,
 
@@ -135,6 +136,7 @@ export class OrderService {
       order_code_transport,
       fee_transport,
       total_price: savedOrder.total_price + fee_transport,
+      receiver_address: dto.address,
     });
 
     await this.orderItemRepo.save(orderItems);

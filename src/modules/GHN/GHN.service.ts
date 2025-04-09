@@ -83,7 +83,9 @@ export class GHNService {
       };
     } catch (error) {
       console.error('Error creating GHN order:', error.response.data);
-      throw new Error('Failed to create GHN order');
+      throw new Error(
+        error.response.data.message || 'Failed to create GHN order',
+      );
     }
   }
 }

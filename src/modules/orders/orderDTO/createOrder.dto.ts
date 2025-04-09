@@ -21,4 +21,8 @@ export class CreateOrderDto {
   @IsNotEmpty()
   @IsString()
   ward_id: string;
+
+  @IsNotEmpty()
+  @IsString()
+  address: string;
 }

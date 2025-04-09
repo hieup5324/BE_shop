@@ -38,8 +38,8 @@ export class OrderController {
 
   @Get('test')
   @UseGuards(AuthGuard)
-  async getUserOrdersV2(@Query() query: OrderQuery) {
-    return await this.orderService.getUserOrdersV2(query);
+  async getUserOrdersV2(@Request() req, @Query() query: OrderQuery) {
+    return await this.orderService.getUserOrdersV2(req.currentUser.id, query);
   }
 
   @Post()
