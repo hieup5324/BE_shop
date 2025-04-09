@@ -50,6 +50,12 @@ export class OrderEntity extends BaseEntityIdNumber {
   @Column({ type: 'varchar', nullable: true })
   receiver_address: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  receiver_name: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  receiver_phone: string;
+
   @ManyToOne(() => UserEntity, (user) => user.orders, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: UserEntity;

@@ -42,6 +42,7 @@ export enum PAYMENT_TYPE {
 export enum ORDER_STATUS {
   PENDING = 'pending',
   WAITING_PICK_UP = 'waiting pick up',
+  BEING_DELIVERY = 'being delivery',
   DELIVERED = 'delivered',
   CANCELLED = 'cancelled',
 }

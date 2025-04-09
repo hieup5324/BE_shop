@@ -131,12 +131,15 @@ export class OrderService {
         })),
       });
 
-    await this.orderRepo.save({
+    const updateOrder = await this.orderRepo.save({
       ...order,
       order_code_transport,
       fee_transport,
       total_price: savedOrder.total_price + fee_transport,
       receiver_address: dto.address,
+      status: ORDER_STATUS.WAITING_PICK_UP,
+      receiver_name: dto.receiver_name,
+      receiver_phone: dto.receiver_phone,
     });
 
     await this.orderItemRepo.save(orderItems);
@@ -144,7 +147,7 @@ export class OrderService {
 
     switch (dto.payment_type) {
       case PAYMENT_TYPE.VNPAY:
-        return await this.vnpayService.createVNPayLink(savedOrder);
+        return await this.vnpayService.createVNPayLink(updateOrder);
       case PAYMENT_TYPE.CASH:
         return savedOrder;
       default:
