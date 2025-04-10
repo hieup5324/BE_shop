@@ -36,6 +36,8 @@ export class OrderService {
     private readonly cartService: CartService,
     private readonly vnpayService: VnPayService,
     private readonly ghnService: GHNService,
+    @Inject(forwardRef(() => ProductService))
+    private readonly productService: ProductService,
   ) {}
 
   async findOrderById(id: number) {
@@ -79,6 +81,16 @@ export class OrderService {
       throw new NotFoundException('Giỏ hàng trống, không thể đặt hàng');
     }
 
+    // Kiểm tra số lượng sản phẩm trong kho
+    for (const item of cart.cartItems) {
+      const product = await this.productService.findById(item.product.id);
+      if (product.quantity < item.quantity) {
+        throw new BadRequestException(
+          `Sản phẩm ${product.product_name} không đủ số lượng trong kho`,
+        );
+      }
+    }
+
     const totalAmount = cart.cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0,
@@ -91,6 +103,7 @@ export class OrderService {
       total_price: totalAmount,
       payment_type: dto.payment_type,
     });
+
     const savedOrder = await this.orderRepo.save(order);
     const orderItems = cart.cartItems.map((item) =>
       this.orderItemRepo.create({
@@ -144,6 +157,15 @@ export class OrderService {
 
     await this.orderItemRepo.save(orderItems);
     await this.cartService.deleteCartItem(userId);
+
+    // Trừ số lượng sản phẩm trong kho
+    for (const item of cart.cartItems) {
+      await this.productService.updateQuantity(
+        item.product.id,
+        item.quantity,
+        'decrease',
+      );
+    }
 
     switch (dto.payment_type) {
       case PAYMENT_TYPE.VNPAY:

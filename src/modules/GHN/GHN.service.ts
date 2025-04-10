@@ -88,4 +88,35 @@ export class GHNService {
       );
     }
   }
+
+  async trackingOrderGHN(body: any) {
+    try {
+      const url = `${this.baseUrl}/v2/shipping-order/detail`;
+      const headers = {
+        Token: this.token,
+      };
+
+      const response = await firstValueFrom(
+        this.httpService.post(url, body, { headers }),
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error tracking GHN order:', error.response.data);
+      throw new Error(
+        error.response.data.message || 'Failed to track GHN order',
+      );
+    }
+  }
+
+  async createOrderGHNB(orderData: any) {
+    const url = `http://localhost:4000/v1/order/test/test`;
+    // const headers = {
+    //   Token: this.token,
+    // };
+    console.log('orderData', orderData);
+    await firstValueFrom(this.httpService.post(url, orderData));
+    return {
+      msg: 'ngon',
+    };
+  }
 }

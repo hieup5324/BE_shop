@@ -14,7 +14,8 @@ import { CloudinaryService } from '../config/cloudinary.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([ProductEntity, UserEntity]),
-    CategoryModule,
+    forwardRef(() => CategoryModule),
+    forwardRef(() => OrderModule),
   ],
   providers: [
     ProductService,

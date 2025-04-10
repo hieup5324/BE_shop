@@ -80,7 +80,7 @@ export class UserService {
     requestBody: UpdateUserDto,
     currentUser: UserEntity,
   ) {
-    if (requestBody.role !== ROLE.USER) {
+    if (requestBody.role !== ROLE.CUSTOMER) {
       throw new BadRequestException('Không thể thay đổi role');
     }
     let user = await this.findById(id);

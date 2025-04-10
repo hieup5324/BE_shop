@@ -45,59 +45,6 @@ export class ProductService {
     return this.productRepo.save(product);
   }
 
-  // async getAll(query: any): Promise<{ products: any[]; totalProducts; limit }> {
-  //   console.log(query);
-  //   let filteredTotalProducts: number;
-  //   let limit: number;
-
-  //   if (!query.limit) {
-  //     limit = 5;
-  //   } else {
-  //     limit = query.limit;
-  //   }
-
-  //   const queryBuilder = dataSource
-  //     .getRepository(ProductEntity)
-  //     .createQueryBuilder('product')
-  //     .leftJoinAndSelect('product.categories', 'category')
-  //     .groupBy('product.id,category.id');
-
-  //   const totalProducts = await queryBuilder.getCount();
-
-  //   if (query.search) {
-  //     const search = query.search;
-  //     queryBuilder.andWhere('product.nameProduct like :nameProduct', {
-  //       nameProduct: `%${search}%`,
-  //     });
-  //   }
-  //   if (query.category) {
-  //     const category = query.category;
-  //     queryBuilder.andWhere('category.title  like :title', {
-  //       title: `%${category}%`,
-  //     });
-  //   }
-  //   if (query.minPrice) {
-  //     queryBuilder.andWhere('product.price>=:minPrice', {
-  //       minPrice: query.minPrice,
-  //     });
-  //   }
-  //   if (query.maxPrice) {
-  //     queryBuilder.andWhere('product.price<=:maxPrice', {
-  //       maxPrice: query.maxPrice,
-  //     });
-  //   }
-
-  //   queryBuilder.limit(limit);
-
-  //   if (query.offset) {
-  //     queryBuilder.offset(query.offset);
-  //   }
-
-  //   const products = await queryBuilder.getRawMany();
-
-  //   return { products, totalProducts, limit };
-  // }
-
   async getProducts(query: ProductQuery): Promise<any> {
     return await this.productRepo.getProducts(query);
   }
@@ -196,21 +143,24 @@ export class ProductService {
     return updateProduct;
   }
 
-  // async updateStock(id: number, stock: number, status: string) {
-  //   let product = await this.findById(id);
-  //   if (status === OrderStatus.DELIVERED) {
-  //     product.stock -= stock;
-  //   } else {
-  //     product.stock += stock;
-  //   }
-  //   product = await this.productRepo.save(product);
-  //   return product;
-  // }
+  async updateQuantity(
+    id: number,
+    quantity: number,
+    action: 'increase' | 'decrease',
+  ): Promise<ProductEntity> {
+    const product = await this.findById(id);
 
-  // async deleteProduct(id: number) {
-  //   const product = await this.findOne(id);
-  //   const order = await this.orderService.findOneByProductId(product.id);
-  //   if (order) throw new BadRequestException('Sản phẩm đang được sử dụng.');
-  //   return await this.productRepo.remove(product);
-  // }
+    if (action === 'decrease') {
+      if (product.quantity < quantity) {
+        throw new BadRequestException(
+          `Sản phẩm ${product.product_name} không đủ số lượng trong kho`,
+        );
+      }
+      product.quantity -= quantity;
+    } else {
+      product.quantity += quantity;
+    }
+
+    return this.productRepo.save(product);
+  }
 }

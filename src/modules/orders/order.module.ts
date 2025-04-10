@@ -10,14 +10,16 @@ import { OrderItemRepository } from './orderItem.repository';
 import { CartModule } from '../cart/cart.module';
 import { VnPayModule } from '../payment/VnPayModule.module';
 import { GHNModule } from '../GHN/GHN.module';
+import { ProductModule } from '../products/product.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([OrderEntity, OrderItemEntity]),
     UserModule,
-    CartModule,
+    forwardRef(() => CartModule),
     GHNModule,
     forwardRef(() => VnPayModule),
+    forwardRef(() => ProductModule),
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderRepository, OrderItemRepository],

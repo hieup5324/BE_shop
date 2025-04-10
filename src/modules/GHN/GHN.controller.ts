@@ -6,6 +6,29 @@ import { GHNCalculateFeeDto } from './dto/caculator-fee.dto';
 export class GHNController {
   constructor(private readonly ghnService: GHNService) {}
 
+  // @Post()
+  // async createOrderB(@Body() order: any) {
+  //   try {
+  //     await this.ghnService.createOrderGHNB(order);
+  //   } catch (error) {
+  //     console.error('Error sending order:', error);
+  //     throw error;
+  //   }
+  // }
+
+  // @Post('update')
+  // async updateOrderStatus(@Body() statusUpdate: any) {
+  //   try {
+  //     console.log('Received order status update:', statusUpdate);
+  //     await new Promise((resolve) => setTimeout(resolve, 10000));
+
+  //     console.log('success order status update:', statusUpdate);
+  //   } catch (error) {
+  //     console.error('Error processing status update:', error);
+  //     throw error;
+  //   }
+  // }
+
   @Get('provinces')
   getProvinces() {
     return this.ghnService.getProvinces();
@@ -29,5 +52,10 @@ export class GHNController {
   @Post('order')
   createOrder(@Body() body: any) {
     return this.ghnService.createOrderGHN(body);
+  }
+
+  @Post('tracking_order')
+  trackingOrder(@Body() body: any) {
+    return this.ghnService.trackingOrderGHN(body);
   }
 }

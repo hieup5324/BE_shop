@@ -6,4 +6,12 @@ export class ProductQuery extends BaseQuery {
   @ApiPropertyOptional()
   @IsOptional()
   search?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  price?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  categoryId?: string;
 }

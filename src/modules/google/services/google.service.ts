@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/modules/users/user.repository';
 import { Auth0UserDto } from 'src/modules/users/userDTO/auth0-user.dto';
+import { CartRepository } from 'src/modules/cart/cart.repository';
 
 @Injectable()
 export class GoogleService {
@@ -11,6 +12,7 @@ export class GoogleService {
 
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly cartRepo: CartRepository,
     private jwtService: JwtService,
   ) {
     this.googleOAuth2Client = new OAuth2Client({
@@ -53,7 +55,10 @@ export class GoogleService {
   }
 
   async addUser(user: Auth0UserDto) {
-    await this.userRepository.save(user);
+    const createdUser = await this.userRepository.save(user);
+    await this.cartRepo.save({
+      user: createdUser,
+    });
   }
 
   async logout(token: string) {

@@ -40,7 +40,7 @@ export class UserEntity extends BaseEntityIdNumber {
   @Column({ type: 'varchar', nullable: true })
   auth0user_token?: string;
 
-  @Column({ type: 'enum', enum: ROLE, default: ROLE.USER })
+  @Column({ type: 'enum', enum: ROLE, default: ROLE.CUSTOMER })
   role: ROLE;
 
   @OneToMany(() => ProductEntity, (productEntity) => productEntity.user, {
