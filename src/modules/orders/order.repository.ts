@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from './entity/order.entity';
 import { OrderQuery } from './orderDTO/orders.query';
+import * as moment from 'moment';
 
 export class OrderRepository extends Repository<OrderEntity> {
   constructor(
@@ -12,14 +13,32 @@ export class OrderRepository extends Repository<OrderEntity> {
   }
 
   async getOrders(userId: number, query: OrderQuery): Promise<any> {
-    let { search, page, page_size } = query;
+    let { search, page, page_size, payment_status, to_date, from_date } = query;
     page = page && !isNaN(Number(page)) ? Number(page) : 1;
     page_size = page_size && !isNaN(Number(page_size)) ? Number(page_size) : 10;
 
     const queryBuilder = this.createQueryBuilder('orders');
+    if (from_date) {
+      queryBuilder.andWhere('orders.createdAt >= :from_date', { from_date });
+    }
+
+    if (to_date) {
+      const toDate = new Date(to_date);
+      toDate.setHours(23, 59, 59, 999);
+      queryBuilder.andWhere('orders.createdAt <= :to_date', {
+        to_date: toDate,
+      });
+    }
+
     if (search) {
       queryBuilder.where('orders.order_code LIKE :search', {
         search: `%${search}%`,
+      });
+    }
+
+    if (payment_status) {
+      queryBuilder.andWhere('orders.status_payment = :payment_status', {
+        payment_status,
       });
     }
 

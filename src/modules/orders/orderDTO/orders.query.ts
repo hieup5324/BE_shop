@@ -6,4 +6,8 @@ export class OrderQuery extends BaseQuery {
   @ApiPropertyOptional()
   @IsOptional()
   search?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  payment_status?: string;
 }

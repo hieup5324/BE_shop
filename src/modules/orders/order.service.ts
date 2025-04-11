@@ -81,7 +81,6 @@ export class OrderService {
       throw new NotFoundException('Giỏ hàng trống, không thể đặt hàng');
     }
 
-    // Kiểm tra số lượng sản phẩm trong kho
     for (const item of cart.cartItems) {
       const product = await this.productService.findById(item.product.id);
       if (product.quantity < item.quantity) {
@@ -158,7 +157,6 @@ export class OrderService {
     await this.orderItemRepo.save(orderItems);
     await this.cartService.deleteCartItem(userId);
 
-    // Trừ số lượng sản phẩm trong kho
     for (const item of cart.cartItems) {
       await this.productService.updateQuantity(
         item.product.id,
