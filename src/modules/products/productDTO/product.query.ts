@@ -14,4 +14,8 @@ export class ProductQuery extends BaseQuery {
   @ApiPropertyOptional()
   @IsOptional()
   categoryId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  is_stock?: string;
 }

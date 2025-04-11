@@ -26,6 +26,9 @@ export class ProductEntity extends BaseEntityIdNumber {
   @Column({ type: 'int' })
   quantity: number;
 
+  @Column({ name: 'category_id', type: 'int' })
+  category_id: number;
+
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.products, {
     onDelete: 'CASCADE',
   })
