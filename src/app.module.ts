@@ -26,6 +26,8 @@ import { OrderItemEntity } from './modules/orders/entity/order-item.entity';
 import { OrderModule } from './modules/orders/order.module';
 import { VnPayModule } from './modules/payment/VnPayModule.module';
 import { GHNModule } from './modules/GHN/GHN.module';
+import { ChatMessageEntity } from './modules/chat-socket/entity/chat-message.entity';
+import { ChatRoomEntity } from './modules/chat-socket/entity/chat-room.entity';
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { GHNModule } from './modules/GHN/GHN.module';
           InvoiceEntity,
           ReviewEntity,
           OrderItemEntity,
+          ChatMessageEntity,
+          ChatRoomEntity,
         ],
         synchronize: true,
         autoLoadEntities: true,
@@ -67,6 +71,7 @@ import { GHNModule } from './modules/GHN/GHN.module';
     AuthModule,
     VnPayModule,
     GHNModule,
+    ChatSocketModule,
   ],
   controllers: [AppController],
   providers: [
