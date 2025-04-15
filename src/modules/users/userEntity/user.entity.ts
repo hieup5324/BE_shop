@@ -7,6 +7,7 @@ import { CategoryEntity } from 'src/modules/categories/entity/categories.entity'
 import { OrderEntity } from 'src/modules/orders/entity/order.entity';
 import { CartEntity } from 'src/modules/cart/entity/cart.entity';
 import { USER_TYPE } from 'src/modules/shared/constants/common';
+import { ChatRoomEntity } from 'src/modules/chat-socket/entity/chat-room.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntityIdNumber {
@@ -58,4 +59,7 @@ export class UserEntity extends BaseEntityIdNumber {
 
   @OneToOne(() => CartEntity, (cart) => cart.user, { cascade: true })
   cart: CartEntity;
+
+  @OneToMany(() => ChatRoomEntity, (room) => room.customer)
+  customer_rooms: ChatRoomEntity[];
 }

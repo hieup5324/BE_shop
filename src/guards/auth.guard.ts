@@ -12,7 +12,7 @@ import { UserService } from 'src/modules/users/user.service';
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userService: UserService, // ✅ Được inject từ UserModule thông qua AuthModule
+    private readonly userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
