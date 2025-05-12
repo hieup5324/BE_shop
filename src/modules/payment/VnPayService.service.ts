@@ -51,7 +51,11 @@ export class VnPayService {
         order_info: vnp_Params.vnp_OrderInfo,
         transaction_status: PAYMENT_STATUS.PENDING,
       });
-      await this.vnPayTransactionRepository.save(transaction);
+      const savedTransaction =
+        await this.vnPayTransactionRepository.save(transaction);
+
+      order.transaction_id = savedTransaction.id;
+      await this.vnPayTransactionRepository.manager.save(order);
 
       return { vnpay_url: vnpUrl };
     } catch (error) {

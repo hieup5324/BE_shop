@@ -12,17 +12,32 @@ export class VNpayRepository extends Repository<VnPayTransactionEntity> {
   }
 
   async getTransaction(query: TransactionQuery): Promise<any> {
-    let { search, page, page_size } = query;
+    let { search, page, page_size, trans_status } = query;
     console.log('query', query);
     page = page && !isNaN(Number(page)) ? Number(page) : 1;
     page_size = page_size && !isNaN(Number(page_size)) ? Number(page_size) : 10;
 
     const queryBuilder = this.createQueryBuilder('Transactions');
-    // if (search) {
-    //   queryBuilder.andWhere('categories.name LIKE :search', {
-    //     search: `%${search}%`,
-    //   });
-    // }
+    if (search) {
+      queryBuilder.andWhere(
+        `(
+          Transactions.bank_code LIKE :search OR
+          Transactions.bank_tran_no LIKE :search OR
+          Transactions.card_type LIKE :search OR
+          Transactions.order_info LIKE :search OR
+          Transactions.response_code LIKE :search OR
+          Transactions.transaction_no LIKE :search OR
+          Transactions.transaction_status LIKE :search
+        )`,
+        { search: `%${search}%` },
+      );
+    }
+
+    if (trans_status) {
+      queryBuilder.andWhere('Transactions.transaction_status = :trans_status', {
+        trans_status,
+      });
+    }
 
     const skip = (page - 1) * page_size;
     queryBuilder.skip(skip).take(page_size);

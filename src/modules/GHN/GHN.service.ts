@@ -13,12 +13,13 @@ export class GHNService {
   constructor(private httpService: HttpService) {}
 
   async getProvinces() {
-    const url = `${this.baseUrl}/master-data/province`;
+    const url = `${this.baseUrl}`;
     const headers = { Token: this.token };
 
     const response = await firstValueFrom(
       this.httpService.get(url, { headers }),
     );
+    console.log(response.data);
     return response.data;
   }
 
@@ -73,7 +74,7 @@ export class GHNService {
         Token: this.token,
         ShopId: this.shopId,
       };
-
+      console.log('orderData', orderData);
       const response = await firstValueFrom(
         this.httpService.post(url, orderData, { headers }),
       );
@@ -108,15 +109,23 @@ export class GHNService {
     }
   }
 
-  async createOrderGHNB(orderData: any) {
-    const url = `http://localhost:4000/v1/order/test/test`;
-    // const headers = {
-    //   Token: this.token,
-    // };
-    console.log('orderData', orderData);
-    await firstValueFrom(this.httpService.post(url, orderData));
-    return {
-      msg: 'ngon',
-    };
+  async cancenlOrderGHN(body: any) {
+    try {
+      const url = `${this.baseUrl}/v2/switch-status/cancel`;
+      const headers = {
+        Token: this.token,
+        ShopId: this.shopId,
+      };
+
+      const response = await firstValueFrom(
+        this.httpService.post(url, body, { headers }),
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error canceling GHN order:', error.response.data);
+      throw new Error(
+        error.response.data.message || 'Failed to cancel GHN order',
+      );
+    }
   }
 }

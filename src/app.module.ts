@@ -28,6 +28,7 @@ import { VnPayModule } from './modules/payment/VnPayModule.module';
 import { GHNModule } from './modules/GHN/GHN.module';
 import { ChatMessageEntity } from './modules/chat-socket/entity/chat-message.entity';
 import { ChatRoomEntity } from './modules/chat-socket/entity/chat-room.entity';
+import { StatisticModule } from './modules/statistics/statistics.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { ChatRoomEntity } from './modules/chat-socket/entity/chat-room.entity';
     VnPayModule,
     GHNModule,
     ChatSocketModule,
+    StatisticModule,
   ],
   controllers: [AppController],
   providers: [

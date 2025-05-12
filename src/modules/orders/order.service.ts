@@ -28,6 +28,7 @@ import { VnPayService } from '../payment/VnPayService.service';
 import * as dayjs from 'dayjs';
 import { OrderQuery } from './orderDTO/orders.query';
 import { GHNService } from '../GHN/GHN.service';
+import { StatisticQuery } from '../statistics/dto/statistic.query';
 @Injectable()
 export class OrderService {
   constructor(
@@ -91,7 +92,7 @@ export class OrderService {
     }
 
     const totalAmount = cart.cartItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) => sum + item.price,
       0,
     );
 
@@ -112,66 +113,74 @@ export class OrderService {
         price: item.price,
       }),
     );
+    try {
+      const { order_code_transport, fee_transport } =
+        await this.ghnService.createOrderGHN({
+          payment_type_id: 1,
+          note: 'Đơn hàng từ Shop LapTop',
+          required_note: 'CHOXEMHANGKHONGTHU',
+          from_name: 'Shop LapTop',
+          from_phone: '0333387484',
+          from_address: 'Đại học Xây Dựng',
+          from_ward_code: '13010',
+          from_district_id: 3440,
 
-    const { order_code_transport, fee_transport } =
-      await this.ghnService.createOrderGHN({
-        payment_type_id: 1,
-        note: 'Đơn hàng từ Shop LapTop',
-        required_note: 'CHOXEMHANGKHONGTHU',
-        from_name: 'Shop LapTop',
-        from_phone: '0333387484',
-        from_address: 'Đại học Xây Dựng',
-        from_ward_code: '13010',
-        from_district_id: 3440,
+          to_name: dto.receiver_name,
+          to_phone: dto.receiver_phone,
+          to_address: dto.receiver_address,
+          to_ward_code: dto.ward_id,
+          to_district_id: dto.district_id,
 
-        to_name: dto.receiver_name,
-        to_phone: dto.receiver_phone,
-        to_address: dto.receiver_address,
-        to_ward_code: dto.ward_id,
-        to_district_id: dto.district_id,
+          weight: 20000,
+          length: 50,
+          width: 50,
+          height: 50,
+          service_type_id: 2,
+          items: cart.cartItems.map((item) => ({
+            name: item.product.product_name,
+            quantity: item.quantity,
+            price: item.price,
+            weight: 10000,
+          })),
+        });
 
-        weight: 20000,
-        length: 50,
-        width: 50,
-        height: 50,
-        service_type_id: 2,
-        items: cart.cartItems.map((item) => ({
-          name: item.product.product_name,
-          quantity: item.quantity,
-          price: item.price,
-          weight: 10000,
-        })),
+      const updateOrder = await this.orderRepo.save({
+        ...order,
+        order_code_transport,
+        fee_transport,
+        total_price: savedOrder.total_price + fee_transport,
+        receiver_address: dto.address,
+        status: ORDER_STATUS.WAITING_PICK_UP,
+        receiver_name: dto.receiver_name,
+        receiver_phone: dto.receiver_phone,
       });
 
-    const updateOrder = await this.orderRepo.save({
-      ...order,
-      order_code_transport,
-      fee_transport,
-      total_price: savedOrder.total_price + fee_transport,
-      receiver_address: dto.address,
-      status: ORDER_STATUS.WAITING_PICK_UP,
-      receiver_name: dto.receiver_name,
-      receiver_phone: dto.receiver_phone,
-    });
+      await this.orderItemRepo.save(orderItems);
+      await this.cartService.deleteCartItem(userId);
 
-    await this.orderItemRepo.save(orderItems);
-    await this.cartService.deleteCartItem(userId);
+      for (const item of cart.cartItems) {
+        await this.productService.updateQuantity(
+          item.product.id,
+          item.quantity,
+          'decrease',
+        );
+      }
 
-    for (const item of cart.cartItems) {
-      await this.productService.updateQuantity(
-        item.product.id,
-        item.quantity,
-        'decrease',
-      );
-    }
-
-    switch (dto.payment_type) {
-      case PAYMENT_TYPE.VNPAY:
-        return await this.vnpayService.createVNPayLink(updateOrder);
-      case PAYMENT_TYPE.CASH:
-        return savedOrder;
-      default:
-        throw new BadRequestException('Phương thức thanh toán không hợp lệ');
+      switch (dto.payment_type) {
+        case PAYMENT_TYPE.VNPAY:
+          return await this.vnpayService.createVNPayLink(updateOrder);
+        case PAYMENT_TYPE.CASH:
+          return savedOrder;
+        default:
+          throw new BadRequestException('Phương thức thanh toán không hợp lệ');
+      }
+    } catch (error) {
+      console.error('Error saving order items:', error);
+      if (savedOrder.order_code_transport) {
+        await this.ghnService.cancenlOrderGHN({
+          order_code: savedOrder.order_code_transport,
+        });
+      }
     }
   }
 
@@ -192,12 +201,37 @@ export class OrderService {
 
       const order = await this.orderRepo.findOne({
         where: { order_code: vnp_TxnRef },
+        relations: ['orderItems', 'orderItems.product'],
       });
+
       if (!order) throw new NotFoundException('Không tìm thấy đơn hàng');
+
       const status =
         vnp_ResponseCode === '00'
           ? PAYMENT_STATUS.SUCCESS
           : PAYMENT_STATUS.FAILED;
+
+      if (status === PAYMENT_STATUS.FAILED) {
+        if (order.order_code_transport) {
+          await this.ghnService.cancenlOrderGHN({
+            order_codes: [order.order_code_transport],
+          });
+        }
+
+        for (const item of order.orderItems) {
+          await this.productService.updateQuantity(
+            item.product.id,
+            item.quantity,
+            'increase',
+          );
+        }
+
+        order.status_payment = status;
+        await this.orderRepo.save(order);
+
+        return res.redirect('http://localhost:3000/payment/failed');
+      }
+
       order.status_payment = status;
       const transaction = await this.vnpayService.getTransactionByOrderId(
         order.id,
@@ -216,173 +250,80 @@ export class OrderService {
         vnp_TransactionStatus === '00'
           ? PAYMENT_STATUS.SUCCESS
           : PAYMENT_STATUS.FAILED;
+
       await this.vnpayService.updateTransaction(transaction);
       await this.orderRepo.save(order);
+
       return res.redirect(
         `http://localhost:3000/payment?transactionId=${transaction.id}`,
       );
     } catch (error) {
-      console.log(error);
+      console.error('Error updating order status:', error);
+      return res.redirect('http://localhost:3000/payment/failed');
     }
   }
-  // async create(
-  //   requestBody: CreateOrderDto,
-  //   currentUser: UserEntity,
-  // ): Promise<OrderEntity> {
-  //   const shippingEntity = new ShippingEntity();
-  //   Object.assign(shippingEntity, requestBody.shipping_address);
-  //   const orderEntity = new OrderEntity();
-  //   orderEntity.shippingAddress = shippingEntity;
-  //   orderEntity.user = currentUser;
-  //   const orderTbl = await this.orderRepo.save(orderEntity);
-  //   let opEntity: {
-  //     order: OrderEntity;
-  //     product: ProductEntity;
-  //     product_quantity: number;
-  //     product_unit_price: number;
-  //   }[] = [];
-  //   for (let i = 0; i < requestBody.order_products.length; i++) {
-  //     const order = orderTbl;
-  //     const product = await this.productService.findById(
-  //       requestBody.order_products[i].id,
-  //     );
-  //     const product_quantity = requestBody.order_products[i].product_quantity;
-  //     const product_unit_price = product.price * product_quantity;
-  //     opEntity.push({
-  //       order,
-  //       product,
-  //       product_quantity,
-  //       product_unit_price,
-  //     });
-  //   }
 
-  //   const op = await this.orderProductRepo
-  //     .createQueryBuilder()
-  //     .insert()
-  //     .into(OrdersProductsEntity)
-  //     .values(opEntity)
-  //     .execute();
-  //   return await this.findOne(orderTbl.id);
-  // }
+  async getTotalRevenue() {
+    const [orders, totalOrdersCompleted] = await this.orderRepo.findAndCount({
+      where: {
+        status: ORDER_STATUS.DELIVERED,
+        status_payment: PAYMENT_STATUS.SUCCESS,
+      },
+    });
+    const totalRevenue = orders.reduce(
+      (sum, order) => sum + order.total_price,
+      0,
+    );
+    return {
+      totalRevenue,
+      totalOrdersCompleted,
+    };
+  }
 
-  // async getAll(): Promise<OrderEntity[]> {
-  //   return await this.orderRepo.find({
-  //     relations: {
-  //       shippingAddress: true,
-  //       user: true,
-  //       products: { product: true },
-  //     },
-  //   });
-  // }
+  async getAllOderRevenen(query: StatisticQuery) {
+    const year = query.year || new Date().getFullYear().toString();
 
-  // async findOne(id: number): Promise<OrderEntity> {
-  //   return await this.orderRepo.findOne({
-  //     where: { id },
-  //     relations: {
-  //       shippingAddress: true,
-  //       user: true,
-  //       products: { product: true },
-  //     },
-  //   });
-  // }
+    const orders = await this.orderRepo
+      .createQueryBuilder('order')
+      .select('EXTRACT(MONTH FROM order.createdAt)', 'month')
+      .addSelect('SUM(order.total_price)', 'total')
+      .where('order.status = :status', { status: ORDER_STATUS.DELIVERED })
+      .andWhere('order.status_payment = :paymentStatus', {
+        paymentStatus: PAYMENT_STATUS.SUCCESS,
+      })
+      .andWhere('EXTRACT(YEAR FROM order.createdAt) = :year', { year })
+      .groupBy('EXTRACT(MONTH FROM order.createdAt)')
+      .orderBy('month', 'ASC')
+      .getRawMany();
 
-  // async findOneByProductId(id: number) {
-  //   return await this.orderProductRepo.findOne({
-  //     relations: { product: true },
-  //     where: { product: { id: id } },
-  //   });
-  // }
+    const monthNames = [
+      'Tháng 1',
+      'Tháng 2',
+      'Tháng 3',
+      'Tháng 4',
+      'Tháng 5',
+      'Tháng 6',
+      'Tháng 7',
+      'Tháng 8',
+      'Tháng 9',
+      'Tháng 10',
+      'Tháng 11',
+      'Tháng 12',
+    ];
 
-  //   async findOneByOption(option: FindOptionsWhere<any>) {
-  //     const product = await this.productRepo.findOneBy(option);
-  //     return product;
-  //   }
+    // Tạo mảng kết quả với tất cả các tháng
+    const result = monthNames.map((name, index) => {
+      const monthData = orders.find(
+        (order) => parseInt(order.month) === index + 1,
+      );
+      return {
+        name,
+        total: monthData ? parseInt(monthData.total) : 0,
+      };
+    });
 
-  //   async findById(id: number) {
-  //     const product = await this.productRepo.findOne({
-  //       where: { id: id },
-  //       relations: {
-  //         categories: true,
-  //         users: true,
-  //       },
-  //     });
-  //     if (!product) {
-  //       throw new NotFoundException('sản phẩm không tồn tại');
-  //     }
-  //     return product;
-  //   }
-
-  // async updateById(
-  //   id: number,
-  //   requestBody: UpdateOrderStatusDto,
-  //   currentUser: UserEntity,
-  // ): Promise<OrderEntity> {
-  //   {
-  //     let order = await this.findOne(id);
-  //     if (!order) throw new NotFoundException('không có order này');
-
-  //     if (
-  //       order.status === OrderStatus.DELIVERED ||
-  //       order.status === OrderStatus.CANCELLED
-  //     ) {
-  //       throw new BadRequestException(`đơn hàng ${order.status}`);
-  //     }
-  //     if (
-  //       order.status === OrderStatus.PROCESSING &&
-  //       requestBody.status != OrderStatus.SHIPPED
-  //     ) {
-  //       throw new BadRequestException(`
-  //       Giao hàng trước khi vận chuyển!!!`);
-  //     }
-  //     if (
-  //       requestBody.status === OrderStatus.SHIPPED &&
-  //       order.status === OrderStatus.SHIPPED
-  //     ) {
-  //       return order;
-  //     }
-  //     if (requestBody.status === OrderStatus.SHIPPED) {
-  //       order.shippedAt = new Date();
-  //     }
-  //     if (requestBody.status === OrderStatus.DELIVERED) {
-  //       order.deliveredAt = new Date();
-  //     }
-  //     order.status = requestBody.status;
-  //     order.updatedBy = currentUser;
-  //     order = await this.orderRepo.save(order);
-  //     if (requestBody.status === OrderStatus.DELIVERED) {
-  //       await this.stockUpdate(order, OrderStatus.DELIVERED);
-  //     }
-  //     return order;
-  //   }
-  // }
-  // async stockUpdate(order: OrderEntity, status: string) {
-  //   for (const op of order.products) {
-  //     await this.productService.updateStock(
-  //       op.product.id,
-  //       op.product_quantity,
-  //       status,
-  //     );
-  //   }
-  // }
-  // async cancelled(id: number, currentUser: UserEntity) {
-  //   let order = await this.findOne(id);
-  //   if (!order) throw new NotFoundException('không có order này');
-  //   if (order.status === OrderStatus.DELIVERED)
-  //     throw new BadRequestException('đơn hàng đã giao không thể hủy');
-  //   if (order.status === OrderStatus.CANCELLED) return order;
-
-  //   order.status = OrderStatus.CANCELLED;
-  //   order.updatedBy = currentUser;
-  //   order = await this.orderRepo.save(order);
-  //   await this.stockUpdate(order, OrderStatus.CANCELLED);
-  //   return order;
-  // }
-
-  // async deleteOrder(id: number) {
-  //   let order = await this.findOne(id);
-  //   if (!order) {
-  //     throw new NotFoundException('không có order này');
-  //   }
-  //   return this.orderRepo.remove(order);
-  // }
+    return {
+      data: result,
+    };
+  }
 }

@@ -6,4 +6,8 @@ export class TransactionQuery extends BaseQuery {
   @ApiPropertyOptional()
   @IsOptional()
   search?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  trans_status?: string;
 }

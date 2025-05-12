@@ -13,7 +13,15 @@ export class OrderRepository extends Repository<OrderEntity> {
   }
 
   async getOrders(userId: number, query: OrderQuery): Promise<any> {
-    let { search, page, page_size, payment_status, to_date, from_date } = query;
+    let {
+      search,
+      page,
+      page_size,
+      payment_status,
+      to_date,
+      from_date,
+      is_admin,
+    } = query;
     page = page && !isNaN(Number(page)) ? Number(page) : 1;
     page_size = page_size && !isNaN(Number(page_size)) ? Number(page_size) : 10;
 
@@ -42,10 +50,13 @@ export class OrderRepository extends Repository<OrderEntity> {
       });
     }
 
+    if (!is_admin) {
+      queryBuilder.andWhere('orders.user_id = :userId', { userId });
+    }
+
     const skip = (page - 1) * page_size;
     queryBuilder.skip(skip).take(page_size);
     queryBuilder.orderBy('orders.createdAt', 'DESC');
-    queryBuilder.andWhere('orders.user_id = :userId', { userId });
     queryBuilder.leftJoinAndSelect('orders.orderItems', 'orderItems');
     queryBuilder.leftJoinAndSelect('orderItems.product', 'product');
 
@@ -71,4 +82,6 @@ export class OrderRepository extends Repository<OrderEntity> {
       },
     };
   }
+
+  async getTotalRevenue() {}
 }

@@ -10,4 +10,8 @@ export class OrderQuery extends BaseQuery {
   @ApiPropertyOptional()
   @IsOptional()
   payment_status?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  is_admin?: boolean;
 }
