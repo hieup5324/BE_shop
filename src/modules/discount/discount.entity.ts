@@ -1,14 +1,5 @@
 import { BaseEntityIdNumber } from 'src/common/base/entities/base.entity';
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ProductEntity } from '../products/entity/product.entity';
 
 @Entity({ name: 'discount' })

@@ -5,16 +5,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { FindOptionsWhere, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { FindOptionsWhere } from 'typeorm';
 import { UserEntity } from '../users/userEntity/user.entity';
-import { CategoryEntity } from './entity/categories.entity';
 import { createCategoryDto } from './categoriesDTO/create-category.dto';
 import { updateCategoryDto } from './categoriesDTO/update-category.dto';
 import { CategoryRepository } from './categories.repository';
 import { CategoryQuery } from './categoriesDTO/categories.query';
 import { ProductService } from '../products/product.service';
-import { query } from 'express';
 
 @Injectable()
 export class CategoryService {

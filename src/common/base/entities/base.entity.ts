@@ -4,7 +4,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
 
 // @Entity()
 export class BaseEntityIdNumber {

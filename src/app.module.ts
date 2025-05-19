@@ -15,9 +15,6 @@ import { CategoryEntity } from './modules/categories/entity/categories.entity';
 import { ChatSocketModule } from './modules/chat-socket/chat-socket.module';
 import { GoogleModule } from './modules/google/google.module';
 import { VnPayTransactionEntity } from './modules/payment/entity/vn_pay_transaction.entity';
-import { DiscountEntity } from './modules/discount/discount.entity';
-import { InvoiceEntity } from './modules/invoice/invoice.entity';
-import { ReviewEntity } from './modules/reviews/review.entity';
 import { CartEntity } from './modules/cart/entity/cart.entity';
 import { CartItemEntity } from './modules/cart/entity/cart-item.entity';
 import { CartModule } from './modules/cart/cart.module';
@@ -50,9 +47,6 @@ import { StatisticModule } from './modules/statistics/statistics.module';
           CartEntity,
           CartItemEntity,
           VnPayTransactionEntity,
-          // DiscountEntity,
-          // InvoiceEntity,
-          // ReviewEntity,
           OrderItemEntity,
           ChatMessageEntity,
           ChatRoomEntity,

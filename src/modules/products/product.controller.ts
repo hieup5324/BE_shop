@@ -3,31 +3,23 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  Delete,
   Get,
   Param,
   ParseIntPipe,
   Post,
-  Put,
   Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
-  Request,
   Patch,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { createProductDto } from './productDTO/createProduct.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { updateProductDto } from './productDTO/updateProduct.dto';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
 import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { RoleGuard, Roles, TYPE_LOGIN } from 'src/guards/role.guard';
 import { ProductEntity } from './entity/product.entity';
-import { query } from 'express';
-import { ProductsDto } from './productDTO/productDto';
-import { SerializeIncludes } from 'src/interceptor/serializa.interceptor';
 import { ProductQuery } from './productDTO/product.query';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '../config/cloudinary.service';

@@ -5,16 +5,8 @@ import {
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
-import { FindOptionsWhere, Or, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from '../users/userEntity/user.entity';
-import { OrderEntity } from './entity/order.entity';
 import { CreateOrderDto } from './orderDTO/createOrder.dto';
-import { ProductEntity } from '../products/entity/product.entity';
 import { ProductService } from '../products/product.service';
-// import { OrdersProductsEntity } from './entity/order-product.entity';
-import { UpdateOrderDto } from './orderDTO/updateOrder.dto';
-import { UpdateOrderStatusDto } from './orderDTO/updateOrder-status.dto';
 import { OrderRepository } from './order.repository';
 import { CartService } from '../cart/cart.service';
 import { OrderItemRepository } from './orderItem.repository';

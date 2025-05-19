@@ -1,17 +1,6 @@
-import {
-  Controller,
-  Get,
-  Query,
-  Param,
-  Post,
-  Body,
-  Req,
-  Res,
-} from '@nestjs/common';
-import { query, Request } from 'express';
+import { Controller, Get, Query, Param, Post, Res } from '@nestjs/common';
 import { OrderService } from 'src/modules/orders/order.service';
 import { VnPayService } from './VnPayService.service';
-import { ORDER_STATUS } from '../shared/constants/common';
 import { TransactionQuery } from './dto/transaction.query';
 
 @Controller('vnpay')

@@ -1,20 +1,15 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
   NotFoundException,
-  forwardRef,
 } from '@nestjs/common';
-import { DataSource, FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere } from 'typeorm';
 import { ProductEntity } from './entity/product.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { createProductDto } from './productDTO/createProduct.dto';
 
 import { updateProductDto } from './productDTO/updateProduct.dto';
 import { UserEntity } from '../users/userEntity/user.entity';
 import { CategoryService } from '../categories/categoies.service';
-import dataSource from 'db/data-source';
-import { OrderService } from '../orders/order.service';
 import { ProductRepository } from './product.repository';
 import { ProductQuery } from './productDTO/product.query';
 

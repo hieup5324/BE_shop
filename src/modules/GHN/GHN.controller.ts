@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { GHNService } from './GHN.service';
 import { GHNCalculateFeeDto } from './dto/caculator-fee.dto';
-import { GHNOrderStatusDto } from './dto/order-status.dto';
 
 @Controller('ghn')
 export class GHNController {

@@ -1,9 +1,7 @@
 import { Repository } from 'typeorm';
 import { UserEntity } from './userEntity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ROLE } from './common/users-role.enum';
 import { UserQuery } from './userDTO/user.query';
-// import * as dayjs from 'dayjs';
 
 export class UserRepository extends Repository<UserEntity> {
   constructor(
@@ -11,28 +9,6 @@ export class UserRepository extends Repository<UserEntity> {
   ) {
     super(userRepo.target, userRepo.manager, userRepo.queryRunner);
   }
-
-  // async findAllUsers() {
-  //   const findUser = await this.userRepo.find({
-  //     where: { role: ROLE.USER },
-  //     select: [
-  //       'id',
-  //       'createdAt',
-  //       'fullname',
-  //       'dob',
-  //       'email',
-  //       'gender',
-  //       'phone',
-  //       'active',
-  //       'role',
-  //     ],
-  //   });
-  //   return findUser.map((user) => ({
-  //     ...user,
-  //     createdAt: dayjs(user.createdAt).format('DD-MM-YYYY'),
-  //     dob: dayjs(user.dob).format('DD-MM-YYYY'),
-  //   }));
-  //
 
   async findUser(query: UserQuery): Promise<any> {
     let { search, page, page_size } = query;

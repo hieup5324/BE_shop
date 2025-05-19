@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { UserEntity } from '../../users/userEntity/user.entity';
 import { BaseEntityIdNumber } from 'src/common/base/entities/base.entity';
 import { CategoryEntity } from 'src/modules/categories/entity/categories.entity';

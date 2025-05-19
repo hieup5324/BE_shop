@@ -4,8 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserEntity } from './userEntity/user.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from './userDTO/updateUser.dto';
 import { RegisterUserDto } from './userDTO/registerUser.dto';
 import { Permission } from './checkPermission.service';
@@ -13,15 +11,11 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
 import { ROLE } from './common/users-role.enum';
 import { ChangePasswordDto } from './userDTO/change-password.dto';
-import { query } from 'express';
 import { UserQuery } from './userDTO/user.query';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly usersRepo: UserRepository,
-    // private readonly repo: Repository<UserEntity>,
-  ) {}
+  constructor(private readonly usersRepo: UserRepository) {}
 
   create(requestbody: RegisterUserDto) {
     const user = this.usersRepo.create(requestbody);

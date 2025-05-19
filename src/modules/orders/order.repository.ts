@@ -2,7 +2,6 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from './entity/order.entity';
 import { OrderQuery } from './orderDTO/orders.query';
-import * as moment from 'moment';
 
 export class OrderRepository extends Repository<OrderEntity> {
   constructor(

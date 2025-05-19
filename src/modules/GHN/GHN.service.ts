@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { GHNCalculateFeeDto } from './dto/caculator-fee.dto';
-import { GHNOrderStatusDto } from './dto/order-status.dto';
 
 @Injectable()
 export class GHNService {

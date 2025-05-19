@@ -1,4 +1,3 @@
-import { Exclude } from 'class-transformer';
 import { ProductEntity } from 'src/modules/products/entity/product.entity';
 import { Entity, Column, OneToMany, OneToOne } from 'typeorm';
 import { ROLE } from '../common/users-role.enum';

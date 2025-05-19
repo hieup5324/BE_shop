@@ -9,9 +9,6 @@ import { UserService } from '../users/user.service';
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
 import { LoginUserDto } from '../users/userDTO/loginUser.dto';
-import { In } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { CartEntity } from '../cart/entity/cart.entity';
 import { CartRepository } from '../cart/cart.repository';
 @Injectable()
 export class AuthService {
@@ -21,7 +18,7 @@ export class AuthService {
     private cartRepo: CartRepository,
   ) {}
   async register(requestBody: RegisterUserDto) {
-    let { email, password } = requestBody;
+    let { email, password, first_name, last_name } = requestBody;
     const userDB = await this.userService.findByEmail(email);
     if (userDB) {
       throw new BadRequestException('Email đã tồn tại');
@@ -32,7 +29,7 @@ export class AuthService {
     const hashedPw = await bcrypt.hash(password, 10);
 
     requestBody.password = hashedPw;
-    // this.sendMail(requestBody.email);
+    await this.sendMail(email, first_name + last_name);
 
     const user = await this.userService.create(requestBody);
     const cart = this.cartRepo.create({ user });
@@ -115,7 +112,7 @@ export class AuthService {
     return { access_token: newToken };
   }
 
-  async sendMail(email: string) {
+  async sendMail(email: string, name: string) {
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
       port: +process.env.MAIL_PORT,
@@ -128,9 +125,9 @@ export class AuthService {
     await transporter.sendMail({
       from: '"Shop Lap" <mminhvcvc1@gmail.com>',
       to: email,
-      subject: 'Hello new user',
+      subject: 'Shop Laptop',
       html:
-        '<b>Hello new user?</b>' +
+        `<b>Chào ${name}</b>` +
         '<p>Chúc mừng bạn đã đăng ký thành công tài khoản tại Shop Lap!</p>',
     });
   }

@@ -2,12 +2,8 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  Delete,
   Get,
-  Param,
-  ParseIntPipe,
   Post,
-  Put,
   UseGuards,
   UseInterceptors,
   Request,
@@ -15,13 +11,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
-import { UserEntity } from '../users/userEntity/user.entity';
-import { RoleGuard } from 'src/guards/role.guard';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './orderDTO/createOrder.dto';
-import { OrderEntity } from './entity/order.entity';
-import { UpdateOrderStatusDto } from './orderDTO/updateOrder-status.dto';
-import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { OrderQuery } from './orderDTO/orders.query';
 
 @Controller('order')

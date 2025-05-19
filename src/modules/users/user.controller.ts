@@ -4,25 +4,18 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
   Post,
-  Put,
   Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { AuthService } from '../auth/auth.service';
-import { RegisterUserDto } from './userDTO/registerUser.dto';
-import { LoginUserDto } from './userDTO/loginUser.dto';
 import { currentUser } from '../shared/decorators/currentUser.decorator';
 import { UserEntity } from './userEntity/user.entity';
-import { RoleGuard } from 'src/guards/role.guard';
 import { UpdateUserDto } from './userDTO/updateUser.dto';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
 import { ChangePasswordDto } from './userDTO/change-password.dto';

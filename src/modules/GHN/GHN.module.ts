@@ -1,4 +1,3 @@
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { GHNController } from './GHN.controller';
 import { GHNService } from './GHN.service';

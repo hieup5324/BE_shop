@@ -1,25 +1,11 @@
 import {
-  BadRequestException,
-  Body,
   ClassSerializerInterceptor,
   Controller,
-  Delete,
   Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
   Query,
-  UploadedFile,
-  UseGuards,
   UseInterceptors,
-  Request,
-  Patch,
 } from '@nestjs/common';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
-import { CloudinaryService } from '../config/cloudinary.service';
-import { AuthGuard } from '@nestjs/passport';
-import { OrderService } from '../orders/order.service';
 import { StatisticService } from './statistics.service';
 import { StatisticQuery } from './dto/statistic.query';
 
