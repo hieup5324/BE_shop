@@ -17,10 +17,8 @@ export class WsAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       const client = context.switchToWs().getClient();
-      console.log('Headers:', client.handshake.headers);
       const token = client.handshake.headers.authorization?.split(' ')[1];
-      console.log('Token:', token);
-      
+
       if (!token) {
         throw new UnauthorizedException('Token không hợp lệ');
       }
@@ -28,8 +26,7 @@ export class WsAuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
-      console.log('Payload:', payload);
-      
+
       const user = await this.userService.findByEmail(payload.email);
       if (!user) {
         throw new UnauthorizedException('Người dùng không tồn tại');

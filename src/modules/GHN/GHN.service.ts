@@ -13,13 +13,13 @@ export class GHNService {
   constructor(private httpService: HttpService) {}
 
   async getProvinces() {
-    const url = `${this.baseUrl}`;
+    const url = `${this.baseUrl}/master-data/province`;
     const headers = { Token: this.token };
 
     const response = await firstValueFrom(
       this.httpService.get(url, { headers }),
     );
-    console.log(response.data);
+
     return response.data;
   }
 
@@ -74,7 +74,6 @@ export class GHNService {
         Token: this.token,
         ShopId: this.shopId,
       };
-      console.log('orderData', orderData);
       const response = await firstValueFrom(
         this.httpService.post(url, orderData, { headers }),
       );

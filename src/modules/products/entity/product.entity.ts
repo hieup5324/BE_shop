@@ -11,12 +11,6 @@ export class ProductEntity extends BaseEntityIdNumber {
   @Column({ type: 'int' })
   price: number;
 
-  @Column({ type: 'int', nullable: true })
-  final_price: number;
-
-  @Column({ type: 'boolean', default: false })
-  has_discount: boolean;
-
   @Column({ type: 'varchar', nullable: true })
   description: string;
 

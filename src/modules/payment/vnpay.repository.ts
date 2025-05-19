@@ -13,7 +13,6 @@ export class VNpayRepository extends Repository<VnPayTransactionEntity> {
 
   async getTransaction(query: TransactionQuery): Promise<any> {
     let { search, page, page_size, trans_status } = query;
-    console.log('query', query);
     page = page && !isNaN(Number(page)) ? Number(page) : 1;
     page_size = page_size && !isNaN(Number(page_size)) ? Number(page_size) : 10;
 
