@@ -326,4 +326,20 @@ export class OrderService {
       data: result,
     };
   }
+
+  async updateOrderV2(statusUpdate: any) {
+    try {
+      const { OrderCode, Status } = statusUpdate;
+      await this.orderRepo.update(
+        { order_code_transport: OrderCode },
+        {
+          status: Status,
+        },
+      );
+      return true;
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      throw error;
+    }
+  }
 }

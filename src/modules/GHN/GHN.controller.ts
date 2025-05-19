@@ -1,33 +1,11 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { GHNService } from './GHN.service';
 import { GHNCalculateFeeDto } from './dto/caculator-fee.dto';
+import { GHNOrderStatusDto } from './dto/order-status.dto';
 
 @Controller('ghn')
 export class GHNController {
   constructor(private readonly ghnService: GHNService) {}
-
-  // @Post()
-  // async createOrderB(@Body() order: any) {
-  //   try {
-  //     await this.ghnService.createOrderGHNB(order);
-  //   } catch (error) {
-  //     console.error('Error sending order:', error);
-  //     throw error;
-  //   }
-  // }
-
-  // @Post('update')
-  // async updateOrderStatus(@Body() statusUpdate: any) {
-  //   try {
-  //     console.log('Received order status update:', statusUpdate);
-  //     await new Promise((resolve) => setTimeout(resolve, 10000));
-
-  //     console.log('success order status update:', statusUpdate);
-  //   } catch (error) {
-  //     console.error('Error processing status update:', error);
-  //     throw error;
-  //   }
-  // }
 
   @Get('provinces')
   getProvinces() {

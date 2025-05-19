@@ -47,4 +47,10 @@ export class OrderController {
   async createOrder(@Request() req, @Body() dto: CreateOrderDto) {
     return this.orderService.createOrder(req.currentUser.id, dto);
   }
+
+  @Post('webhook')
+  async updateOrderStatus(@Body() statusUpdate: any) {
+    this.orderService.updateOrderV2(statusUpdate);
+    return { success: true, message: 'Webhook received' };
+  }
 }
